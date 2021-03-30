@@ -36,7 +36,9 @@ contract NftFractionsDex is
 
     /**
      * @dev Deposit an ERC721 token and mints an ERC1155 token with the given fractions amount
-     * the original ERC721 token is transferred to the address of this smart contract
+     * the original ERC721 token is transferred to the address of this smart contract.
+     * Before calling this function the user has to call the apporve function on the original NFT contract and
+     * approve this smart contract to transfer his NFT.
      *
      * Requirements:
      * - msg.sender has to own the token that is deposited
