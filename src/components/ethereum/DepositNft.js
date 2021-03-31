@@ -1,128 +1,92 @@
-import React, { useEffect, useState } from 'react';
-import getWeb3 from "../../util/getWeb3";
-import NftFractionsDex from '../../contracts/NftFractionsDex.json';
-import ERC721Mock from '../../contracts/ERC721Mock.json';
+import React from 'react';
 import { GAS_LIMIT } from '../../config/settings.js'
 import { TextField, Button } from '@material-ui/core/'
-import { makeStyles } from '@material-ui/core/styles'
-import Box from '@material-ui/core/Box'
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import ERC721Mock from '../../contracts/ERC721Mock.json';
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        '& .MuiTextField-root': {
-            margin: theme.spacing(1),
-        },
-        '& .MuiButton-root': {
-            margin: theme.spacing(1),
-        },
-        '& .MuiTypography-root': {
-            margin: theme.spacing(1),
-        },
-    },
-}));
-
-const DepositNft = () => {
-    const classes = useStyles();
-    const [web3, setWeb3] = useState(undefined);
-    const [accounts, setAccounts] = useState(undefined);
-    const [nftFractionsDexContract, setNftFractionsDexContract] = useState(undefined);
+const DepositNft = ({ web3, accounts, nftFractionsDexContract, nftDepositDialogOpen, setNftDepositDialogOpen }) => {
+    const defaultDialogContentText = 'Please, specify the contract address and the token id of your NFT along with the amount of shares that you want to create! Before the deposit the system will ask your allowance to transfer the NFT.';
+    const [dialogContentText, setDialogContentText] = React.useState(defaultDialogContentText);
 
     const [originalContract, setOriginalContract] = React.useState('');
     const [originalTokenId, setOriginalTokenId] = React.useState('');
     const [fractionsAmount, setFractionsAmount] = React.useState('');
 
-    useEffect(() => {
-        const init = async () => {
-            const web3 = await getWeb3();
-            const accounts = await web3.eth.getAccounts();
-            const networkId = await web3.eth.net.getId();
-            const deployedNetwork = NftFractionsDex.networks[networkId];
-            const nftFractionsDexContract = new web3.eth.Contract(
-                NftFractionsDex.abi,
-                deployedNetwork && deployedNetwork.address,
-            );
-
-            console.log(networkId);
-            setWeb3(web3);
-            setAccounts(accounts);
-            setNftFractionsDexContract(nftFractionsDexContract);
-        }
-        init();
-        window.ethereum.on('accountsChanged', accounts => {
-            setAccounts(accounts);
-        });
-    }, []);
-
-    const isReady = () => {
-        return (
-            typeof nftFractionsDexContract !== 'undefined'
-            && typeof web3 !== 'undefined'
-            && typeof accounts !== 'undefined'
-        );
-    }
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        const accounts = await web3.eth.getAccounts();
-
+    const handleSubmit = async () => {
         let config = {
             gas: GAS_LIMIT,
             from: accounts[0]
         }
         const erc721contract = new web3.eth.Contract(ERC721Mock.abi, originalContract);
         await erc721contract.methods.approve(nftFractionsDexContract._address, originalTokenId).send(config);
-        await nftFractionsDexContract.methods.depositNft(originalContract, originalTokenId, fractionsAmount).send(config)
-            .once('receipt', (receipt) => {
-                console.log(receipt);
-            });
+        await nftFractionsDexContract.methods.depositNft(originalContract, originalTokenId, fractionsAmount).send(config);
 
         setOriginalContract('');
-        setOriginalTokenId();
-        setFractionsAmount();
-    }
+        setOriginalTokenId(0);
+        setFractionsAmount(0);
+    };
 
-    if (!isReady()) {
-        return <div>Loading...</div>;
-    }
+    const handleClose = () => {
+        setNftDepositDialogOpen(false);
+    };
+
+    const handleCloseWithDialogContentTextReset = async () => {
+        setDialogContentText(defaultDialogContentText);
+        handleClose();
+    };
 
     return (
-        <Box mt={2}>
-            <form className={classes.root} noValidate autoComplete="off" onSubmit={handleSubmit}>
-                <TextField
-                    variant="outlined"
-                    fullWidth
-                    required
-                    id="originalContract"
-                    value={originalContract}
-                    onInput={e => setOriginalContract(e.target.value)}
-                    label="Contract address"
-                    margin="dense" />
-                <TextField
-                    variant="outlined"
-                    fullWidth
-                    id="originalTokenId"
-                    value={originalTokenId || ''}
-                    onInput={e => setOriginalTokenId(e.target.value)}
-                    label="Token ID"
-                    type="number"
-                    margin="dense" />
-                <TextField
-                    variant="outlined"
-                    fullWidth
-                    id="fractionsAmount"
-                    value={fractionsAmount || ''}
-                    onInput={e => setFractionsAmount(e.target.value)}
-                    label="Shares amount"
-                    type="number"
-                    margin="dense" />
-                <Button
-                    fullWidth
-                    variant="outlined"
-                    type="submit">
-                    Deposit
-                </Button>
-            </form>
-        </Box>
+        <>
+            <Dialog open={nftDepositDialogOpen} onClose={handleClose} aria-labelledby="form-dialog-title" disableBackdropClick>
+                <DialogTitle id="form-dialog-title">NFT deposit</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {dialogContentText}
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="originalContract"
+                        label="Contract address"
+                        value={originalContract}
+                        onInput={e => setOriginalContract(e.target.value)}
+                        fullWidth
+                    />
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="originalTokenId"
+                        label="Token ID"
+                        value={originalTokenId}
+                        onInput={e => setOriginalTokenId(e.target.value)}
+                        type="number"
+                        fullWidth
+                    />
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="fractionsAmount"
+                        label="Shares amount"
+                        value={fractionsAmount}
+                        onInput={e => setFractionsAmount(e.target.value)}
+                        type="number"
+                        fullWidth
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseWithDialogContentTextReset} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={() => { handleSubmit() }} color="primary">
+                        Deposit
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     )
 
 }

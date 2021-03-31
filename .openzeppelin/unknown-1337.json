@@ -1,146 +1,6 @@
 {
   "manifestVersion": "3.1",
   "impls": {
-    "3966629ced79dbdc8ffc87f812f00f8cc416e6b62b1c02f3c38efb88e166a409": {
-      "address": "0x6f422772341b70275Cacf442240702E29D0D151C",
-      "txHash": "0x0f48630f0e536e6ca55af9c26c53ee18bdb659c5305a0e9281e603dfad59ee4f",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:30"
-          },
-          {
-            "contract": "ContextUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
-          },
-          {
-            "contract": "ERC165Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:35"
-          },
-          {
-            "contract": "ERC1155Upgradeable",
-            "label": "_balances",
-            "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))",
-            "src": "../@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol:25"
-          },
-          {
-            "contract": "ERC1155Upgradeable",
-            "label": "_operatorApprovals",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
-            "src": "../@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol:28"
-          },
-          {
-            "contract": "ERC1155Upgradeable",
-            "label": "_uri",
-            "type": "t_string_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol:31"
-          },
-          {
-            "contract": "ERC1155Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)47_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol:406"
-          },
-          {
-            "contract": "PausableUpgradeable",
-            "label": "_paused",
-            "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:28"
-          },
-          {
-            "contract": "PausableUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:96"
-          },
-          {
-            "contract": "NftFractionsDex",
-            "label": "_ids",
-            "type": "t_struct(Counter)1980_storage",
-            "src": "NftFractionsDex.sol:17"
-          },
-          {
-            "contract": "NftFractionsDex",
-            "label": "originalTokens",
-            "type": "t_mapping(t_uint256,t_struct(OriginalToken)57_storage)",
-            "src": "NftFractionsDex.sol:24"
-          }
-        ],
-        "types": {
-          "t_struct(Counter)1980_storage": {
-            "label": "struct CountersUpgradeable.Counter",
-            "members": [
-              {
-                "label": "_value",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_mapping(t_uint256,t_struct(OriginalToken)57_storage)": {
-            "label": "mapping(uint256 => struct NftFractionsDex.OriginalToken)"
-          },
-          "t_struct(OriginalToken)57_storage": {
-            "label": "struct NftFractionsDex.OriginalToken",
-            "members": [
-              {
-                "label": "originalContract",
-                "type": "t_address"
-              },
-              {
-                "label": "originalTokenId",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_address": {
-            "label": "address"
-          },
-          "t_bool": {
-            "label": "bool"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
-          },
-          "t_mapping(t_uint256,t_mapping(t_address,t_uint256))": {
-            "label": "mapping(uint256 => mapping(address => uint256))"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
-            "label": "mapping(address => mapping(address => bool))"
-          },
-          "t_mapping(t_address,t_bool)": {
-            "label": "mapping(address => bool)"
-          },
-          "t_string_storage": {
-            "label": "string"
-          },
-          "t_array(t_uint256)47_storage": {
-            "label": "uint256[47]"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]"
-          }
-        }
-      }
-    },
     "c58e116fadd4289ff4fb2021b96ff0ea79d8dfc1f312980a63e161f6e57bb593": {
       "address": "0x99816BB1F5803340e9B790fbf419Dfdd3Add103c",
       "txHash": "0x06f539aa4c6ba10c3c49abab96a633d015e50dc05fb6bff77d7fd025a0674815",
@@ -1018,8 +878,8 @@
       }
     },
     "f0e2ea0c8d12667b76a881d3154207fb8e24c7db5a1da965f722f3d8830aee96": {
-      "address": "0xfD4104de4f5C2182E05D54A697f86e932E25738A",
-      "txHash": "0xc161747c9cebe2bab3e9c346e10fc7ebb2af9f26fc59ee77060026b427e51827",
+      "address": "0x6f422772341b70275Cacf442240702E29D0D151C",
+      "txHash": "0x51a14e9e061f9145effb29122277a08e48adb24c4d61a719d662597a681b8be8",
       "layout": {
         "storage": [
           {
@@ -1097,7 +957,7 @@
           {
             "contract": "NftFractionsDex",
             "label": "_ids",
-            "type": "t_struct(Counter)2073_storage",
+            "type": "t_struct(Counter)2075_storage",
             "src": "NftFractionsDex.sol:19"
           },
           {
@@ -1114,7 +974,7 @@
           }
         ],
         "types": {
-          "t_struct(Counter)2073_storage": {
+          "t_struct(Counter)2075_storage": {
             "label": "struct CountersUpgradeable.Counter",
             "members": [
               {

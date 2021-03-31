@@ -41,7 +41,7 @@ function MenuBar() {
                         <Grid container spacing={24}>
                             <Grid item md={6}>
                                 <Box mt={1.5} mr={1}>
-                                    <Button color="inherit" variant="outlined" fullWidth component={Link} target={"_blank"} to="/ethereum/register">Open on Ethereum</Button>
+                                    <Button color="inherit" variant="outlined" fullWidth component={Link} target={"_blank"} to="/ethereum/landing">Open on Ethereum</Button>
                                 </Box>
                             </Grid>
                             <Grid item md={6}>

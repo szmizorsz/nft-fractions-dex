@@ -7,7 +7,7 @@ import {
   Switch,
   Route
 } from "react-router-dom";
-import DepositNft from './components/ethereum/DepositNft.js';
+import LandingPage from './components/ethereum/LandingPage.js';
 
 function App() {
   return (
@@ -20,8 +20,8 @@ function App() {
             <Box mt={10}>
               <div className="content">
                 <Switch>
-                  <Route path="/ethereum/register">
-                    <DepositNft />
+                  <Route path="/ethereum/landing">
+                    <LandingPage />
                   </Route>
                 </Switch>
               </div>
