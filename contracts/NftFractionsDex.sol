@@ -18,13 +18,15 @@ contract NftFractionsDex is
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter private _ids;
 
-    struct OriginalToken {
-        address originalContract;
-        uint256 originalTokenId;
+    struct Token {
+        address erc721ContractAddress;
+        uint256 erc721TokenId;
+        uint256 totalFractionsAmount;
     }
 
-    mapping(uint256 => OriginalToken) originalTokens;
-    mapping(uint256 => uint256) fractionsAmountByTokenId;
+    mapping(address => uint256[]) tokenIdsByShareOwner;
+    mapping(uint256 => Token) tokens;
+    uint256[] tokenIds;
 
     function initialize(string memory uri_) public initializer {
         __Context_init_unchained();
@@ -44,29 +46,27 @@ contract NftFractionsDex is
      * - msg.sender has to own the token that is deposited
      */
     function depositNft(
-        address originalContractAddress,
-        uint256 originalTokenId,
+        address erc721ContractAddress,
+        uint256 erc721TokenId,
         uint256 fractionsAmountToMint
     ) external {
         require(!paused(), "Not allowed while paused");
-        IERC721 originalContract = IERC721(originalContractAddress);
+        IERC721 erc721Contract = IERC721(erc721ContractAddress);
         require(
-            originalContract.ownerOf(originalTokenId) == msg.sender,
+            erc721Contract.ownerOf(erc721TokenId) == msg.sender,
             "msg sender has to own the token to deposit"
         );
-        originalContract.transferFrom(
-            msg.sender,
-            address(this),
-            originalTokenId
-        );
+        erc721Contract.transferFrom(msg.sender, address(this), erc721TokenId);
         _ids.increment();
         uint256 newItemId = _ids.current();
         _mint(msg.sender, newItemId, fractionsAmountToMint, "");
-        OriginalToken memory originalToken;
-        originalToken.originalContract = originalContractAddress;
-        originalToken.originalTokenId = originalTokenId;
-        originalTokens[newItemId] = originalToken;
-        fractionsAmountByTokenId[newItemId] = fractionsAmountToMint;
+        Token memory token;
+        token.erc721ContractAddress = erc721ContractAddress;
+        token.erc721TokenId = erc721TokenId;
+        token.totalFractionsAmount = fractionsAmountToMint;
+        tokens[newItemId] = token;
+        tokenIdsByShareOwner[msg.sender].push(newItemId);
+        tokenIds.push(newItemId);
     }
 
     /**
@@ -75,23 +75,35 @@ contract NftFractionsDex is
      * - original ERC721 token id
      * - amount of fractions minted
      */
-    function getTokenData(uint256 tokenId)
+    function getTokenData(uint256 _tokenId)
         public
         view
         returns (
-            address originalContract,
-            uint256 originalTokenId,
-            uint256 fractionsAmount
+            address erc721ContractAddress,
+            uint256 erc721TokenId,
+            uint256 totalFractionsAmount
         )
     {
         return (
-            originalTokens[tokenId].originalContract,
-            originalTokens[tokenId].originalTokenId,
-            fractionsAmountByTokenId[tokenId]
+            tokens[_tokenId].erc721ContractAddress,
+            tokens[_tokenId].erc721TokenId,
+            tokens[_tokenId].totalFractionsAmount
         );
     }
 
     function pause() public onlyOwner() {
         _pause();
+    }
+
+    function getTokenIdsByShareOwner(address shareOwner)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return tokenIdsByShareOwner[shareOwner];
+    }
+
+    function getTokenIds() public view returns (uint256[] memory) {
+        return tokenIds;
     }
 }
