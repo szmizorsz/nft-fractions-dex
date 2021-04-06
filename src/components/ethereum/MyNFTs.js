@@ -23,6 +23,7 @@ const MyNFTs = ({ web3, accounts, nftFractionsDexContract, ipfs }) => {
                     }
                     nftMetadataFromIPFS = JSON.parse(content.toString());
                 }
+                nftMetadataFromIPFS.tokenId = tokenId;
                 nftMetadataFromIPFS.sharesAmount = tokenData.totalFractionsAmount;
                 nftMetadataFromIPFS.myShares = myShares;
                 nftsFromIpfs.push(nftMetadataFromIPFS);
@@ -34,7 +35,7 @@ const MyNFTs = ({ web3, accounts, nftFractionsDexContract, ipfs }) => {
 
     return (
         <>
-            <NFTCards nftList={nftList} />
+            <NFTCards nftList={nftList} nftFractionsDexContract={nftFractionsDexContract} accounts={accounts} />
         </>
     )
 

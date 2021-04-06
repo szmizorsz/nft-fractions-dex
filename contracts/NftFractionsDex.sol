@@ -44,6 +44,7 @@ contract NftFractionsDex is
      *
      * Requirements:
      * - msg.sender has to own the token that is deposited
+     * - the contract is not paused
      */
     function depositNft(
         address erc721ContractAddress,
@@ -67,6 +68,61 @@ contract NftFractionsDex is
         tokens[newItemId] = token;
         tokenIdsByShareOwner[msg.sender].push(newItemId);
         tokenIds.push(newItemId);
+    }
+
+    /**
+     * @dev Withdraw an ERC721 token from this contract. The message sender has to own all of the shares in
+     * the correspondign ERC1155 token.
+     * Successfull withdraw means:
+     * - burning the ERC1155 token
+     * - transfering the ERC721 token to the owner (msg.sender) = owner of all shares in the ERC1155 token
+     *
+     * Requirements:
+     * - msg.sender has to own all shares in the corresponding ERC1155 token
+     * - the contract is not paused
+     */
+    function withdrawNft(uint256 tokenId) external {
+        require(!paused(), "Not allowed while paused");
+        uint256 totalFractionsAmount = tokens[tokenId].totalFractionsAmount;
+        uint256 sendersAmount = balanceOf(msg.sender, tokenId);
+        require(
+            totalFractionsAmount == sendersAmount,
+            "message sender has to own all of the shares"
+        );
+        //sends the original token in the ERC721 contract
+        address erc721ContractAddress = tokens[tokenId].erc721ContractAddress;
+        uint256 erc721TokenId = tokens[tokenId].erc721TokenId;
+        IERC721 erc721Contract = IERC721(erc721ContractAddress);
+        erc721Contract.transferFrom(address(this), msg.sender, erc721TokenId);
+        //burns the ERC1155 token
+        _burn(msg.sender, tokenId, totalFractionsAmount);
+        //deletes the ERC1155 token from the tokenIdsByShareOwner array
+        uint256 nrOfTokensByShareOwner =
+            tokenIdsByShareOwner[msg.sender].length;
+        uint256 tokenIdPositionInShareOwner;
+        for (uint256 i; i < nrOfTokensByShareOwner; i++) {
+            if (tokenId == tokenIdsByShareOwner[msg.sender][i]) {
+                tokenIdPositionInShareOwner = i;
+                break;
+            }
+        }
+        tokenIdsByShareOwner[msg.sender][
+            tokenIdPositionInShareOwner
+        ] = tokenIdsByShareOwner[msg.sender][nrOfTokensByShareOwner - 1];
+        tokenIdsByShareOwner[msg.sender].pop();
+        //deletes the ERC1155 token from the tokenIds array
+        uint256 nrOfTokens = tokenIds.length;
+        uint256 tokenIdPosition;
+        for (uint256 i; i < nrOfTokens; i++) {
+            if (tokenId == tokenIds[i]) {
+                tokenIdPosition = i;
+                break;
+            }
+        }
+        tokenIds[tokenIdPosition] = tokenIds[nrOfTokens - 1];
+        tokenIds.pop();
+        //deletes the token struct
+        delete tokens[tokenId];
     }
 
     /**
@@ -95,6 +151,9 @@ contract NftFractionsDex is
         _pause();
     }
 
+    /**
+     * @dev returns the ERC1155 tokenIds that the shareOwner has shares in
+     */
     function getTokenIdsByShareOwner(address shareOwner)
         public
         view
@@ -103,6 +162,9 @@ contract NftFractionsDex is
         return tokenIdsByShareOwner[shareOwner];
     }
 
+    /**
+     * @dev returns all ERC1155 tokenIds managed by this contract
+     */
     function getTokenIds() public view returns (uint256[] memory) {
         return tokenIds;
     }

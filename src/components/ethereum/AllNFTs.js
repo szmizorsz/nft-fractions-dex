@@ -10,7 +10,6 @@ const AllNFTs = ({ web3, accounts, nftFractionsDexContract, ipfs }) => {
         const loadNfts = async () => {
             const nftsFromIpfs = [];
             const tokenIds = await nftFractionsDexContract.methods.getTokenIds().call();
-            debugger
             for (let tokenId of tokenIds) {
                 const tokenData = await nftFractionsDexContract.methods.getTokenData(tokenId).call();
                 const myShares = await nftFractionsDexContract.methods.balanceOf(accounts[0], tokenId).call()
@@ -24,6 +23,7 @@ const AllNFTs = ({ web3, accounts, nftFractionsDexContract, ipfs }) => {
                     }
                     nftMetadataFromIPFS = JSON.parse(content.toString());
                 }
+                nftMetadataFromIPFS.tokenId = tokenId;
                 nftMetadataFromIPFS.myShares = myShares;
                 nftMetadataFromIPFS.sharesAmount = tokenData.totalFractionsAmount;
                 nftsFromIpfs.push(nftMetadataFromIPFS);
@@ -35,7 +35,7 @@ const AllNFTs = ({ web3, accounts, nftFractionsDexContract, ipfs }) => {
 
     return (
         <>
-            <NFTCards nftList={nftList} />
+            <NFTCards nftList={nftList} nftFractionsDexContract={nftFractionsDexContract} accounts={accounts} />
         </>
     )
 

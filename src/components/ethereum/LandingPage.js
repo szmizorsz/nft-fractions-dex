@@ -171,7 +171,6 @@ const LandingPage = () => {
                     ipfs={ipfs} />
             </TabPanel>
 
-
             <DepositNft
                 web3={web3}
                 accounts={accounts}

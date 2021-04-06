@@ -9,6 +9,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Box from '@material-ui/core/Box';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
+import { GAS_LIMIT } from '../../config/settings.js'
 
 const useStyles = makeStyles((theme) => ({
 
@@ -21,13 +22,21 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const NFTCards = ({ nftList }) => {
+const NFTCards = ({ nftList, nftFractionsDexContract, accounts }) => {
     const classes = useStyles();
 
-    const withdrawButtonDisplay = (myShares, totalShares) => {
+    const handleWithdrawSubmit = async (tokenId) => {
+        let config = {
+            gas: GAS_LIMIT,
+            from: accounts[0]
+        }
+        await nftFractionsDexContract.methods.withdrawNft(tokenId).send(config);
+    };
+
+    const withdrawButtonDisplay = (myShares, totalShares, tokenId, row) => {
         if (myShares === totalShares) {
             return <Box ml={30} >
-                <Button size="small" color="primary">
+                <Button size="small" color="primary" onClick={() => { handleWithdrawSubmit(tokenId) }}>
                     Withdraw
                 </Button>
             </Box>;
@@ -63,7 +72,7 @@ const NFTCards = ({ nftList }) => {
                                         Own/Total shares: {row.myShares}/{row.sharesAmount}
                                     </Typography>
                                 </Box>
-                                {withdrawButtonDisplay(row.myShares, row.sharesAmount)}
+                                {withdrawButtonDisplay(row.myShares, row.sharesAmount, row.tokenId, row)}
                             </CardActions>
                         </Card>
                     </Box>
