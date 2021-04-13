@@ -25,23 +25,20 @@ const DepositNft = ({ web3, accounts, nftFractionsDexContract, nftDepositDialogO
         await erc721contract.methods.approve(nftFractionsDexContract._address, originalTokenId).send(config);
         await nftFractionsDexContract.methods.depositNft(originalContract, originalTokenId, fractionsAmount).send(config);
 
-        setOriginalContract('');
-        setOriginalTokenId(0);
-        setFractionsAmount(0);
-    };
-
-    const handleClose = () => {
-        setNftDepositDialogOpen(false);
+        handleCloseWithDialogContentTextReset();
     };
 
     const handleCloseWithDialogContentTextReset = async () => {
+        setOriginalContract('');
+        setOriginalTokenId('');
+        setFractionsAmount('');
         setDialogContentText(defaultDialogContentText);
-        handleClose();
+        setNftDepositDialogOpen(false);
     };
 
     return (
         <>
-            <Dialog open={nftDepositDialogOpen} onClose={handleClose} aria-labelledby="form-dialog-title" disableBackdropClick>
+            <Dialog open={nftDepositDialogOpen} onClose={handleCloseWithDialogContentTextReset} aria-labelledby="form-dialog-title" disableBackdropClick>
                 <DialogTitle id="form-dialog-title">NFT deposit</DialogTitle>
                 <DialogContent>
                     <DialogContentText>

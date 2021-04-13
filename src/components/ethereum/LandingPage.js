@@ -13,6 +13,7 @@ import { IPFS } from '../../config/settings'
 import { Button } from '@material-ui/core/'
 import DepositNft from './DepositNft.js'
 import Grid from '@material-ui/core/Grid';
+import EthBalance from './EthBalance.js'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -139,6 +140,7 @@ const LandingPage = () => {
                             <AntTabs value={value} onChange={handleChange} aria-label="ant example">
                                 <AntTab label="All NFTs" />
                                 <AntTab label="My NFTs" />
+                                <AntTab label="ETH Balance" />
                             </AntTabs>
                             <Typography className={classes.padding} />
                         </div>
@@ -169,6 +171,11 @@ const LandingPage = () => {
                     accounts={accounts}
                     nftFractionsDexContract={nftFractionsDexContract}
                     ipfs={ipfs} />
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+                <EthBalance
+                    accounts={accounts}
+                    nftFractionsDexContract={nftFractionsDexContract} />
             </TabPanel>
 
             <DepositNft
