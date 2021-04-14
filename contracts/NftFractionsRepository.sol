@@ -9,14 +9,13 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract NftFractionsDex is
+contract NftFractionsRepository is
     Initializable,
     ERC1155Upgradeable,
     PausableUpgradeable,
     OwnableUpgradeable
 {
     using CountersUpgradeable for CountersUpgradeable.Counter;
-    CountersUpgradeable.Counter private _ids;
 
     struct Token {
         address erc721ContractAddress;
@@ -24,10 +23,10 @@ contract NftFractionsDex is
         uint256 totalFractionsAmount;
     }
 
+    CountersUpgradeable.Counter private _ids;
     mapping(address => uint256[]) tokenIdsByShareOwner;
     mapping(uint256 => Token) tokens;
     uint256[] tokenIds;
-    mapping(address => uint256) ethBalance;
 
     function initialize(string memory uri_) public initializer {
         __Context_init_unchained();
@@ -124,32 +123,6 @@ contract NftFractionsDex is
         tokenIds.pop();
         //deletes the token struct
         delete tokens[tokenId];
-    }
-
-    /**
-     * @dev deposit ETH for trading
-     */
-    function depositEth() public payable {
-        ethBalance[msg.sender] += msg.value;
-    }
-
-    /**
-     * @dev Withdraw ETH
-     *
-     * Requirements:
-     * - msg.sender has to have equal or more ETH than the amount to withdraw
-     */
-    function withdrawEth(uint256 amount) public {
-        require(ethBalance[msg.sender] >= amount, "ETH balance is not enough");
-        ethBalance[msg.sender] -= amount;
-        payable(msg.sender).transfer(amount);
-    }
-
-    /**
-     * @dev returns the ETH balance of the owner
-     */
-    function getEthBalance(address owner) public view returns (uint256) {
-        return ethBalance[owner];
     }
 
     /**

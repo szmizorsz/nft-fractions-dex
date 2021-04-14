@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import getWeb3 from "../../util/getWeb3";
-import NftFractionsDex from '../../contracts/NftFractionsDex.json';
+import NftFractionsRepository from '../../contracts/NftFractionsRepository.json';
+import Dex from '../../contracts/Dex.json';
 import Box from '@material-ui/core/Box'
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -89,7 +90,8 @@ const useStyles = makeStyles((theme) => ({
 const LandingPage = () => {
     const [web3, setWeb3] = useState(undefined);
     const [accounts, setAccounts] = useState(undefined);
-    const [nftFractionsDexContract, setNftFractionsDexContract] = useState(undefined);
+    const [nftFractionsRepositoryContract, setNftFractionsRepositoryContract] = useState(undefined);
+    const [dexContract, setDexContract] = useState(undefined);
     const [ipfs] = useState(ipfsClient({ host: IPFS.HOST, port: IPFS.PORT, protocol: IPFS.PROTOCOL }));
     const [nftDepositDialogOpen, setNftDepositDialogOpen] = useState(false);
 
@@ -104,14 +106,20 @@ const LandingPage = () => {
             const web3 = await getWeb3();
             const accounts = await web3.eth.getAccounts();
             const networkId = await web3.eth.net.getId();
-            const deployedNetwork = NftFractionsDex.networks[networkId];
-            const nftFractionsDexContract = new web3.eth.Contract(
-                NftFractionsDex.abi,
+            let deployedNetwork = NftFractionsRepository.networks[networkId];
+            const nftFractionsRepositoryContract = new web3.eth.Contract(
+                NftFractionsRepository.abi,
+                deployedNetwork && deployedNetwork.address,
+            );
+            deployedNetwork = Dex.networks[networkId];
+            const dexContract = new web3.eth.Contract(
+                Dex.abi,
                 deployedNetwork && deployedNetwork.address,
             );
             setWeb3(web3);
             setAccounts(accounts);
-            setNftFractionsDexContract(nftFractionsDexContract);
+            setNftFractionsRepositoryContract(nftFractionsRepositoryContract);
+            setDexContract(dexContract);
         }
         init();
         window.ethereum.on('accountsChanged', accounts => {
@@ -121,7 +129,7 @@ const LandingPage = () => {
 
     const isReady = () => {
         return (
-            typeof nftFractionsDexContract !== 'undefined'
+            typeof nftFractionsRepositoryContract !== 'undefined'
             && typeof web3 !== 'undefined'
             && typeof accounts !== 'undefined'
         );
@@ -162,26 +170,26 @@ const LandingPage = () => {
                 <AllNFTs
                     web3={web3}
                     accounts={accounts}
-                    nftFractionsDexContract={nftFractionsDexContract}
+                    nftFractionsRepositoryContract={nftFractionsRepositoryContract}
                     ipfs={ipfs} />
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <MyNFTs
                     web3={web3}
                     accounts={accounts}
-                    nftFractionsDexContract={nftFractionsDexContract}
+                    nftFractionsRepositoryContract={nftFractionsRepositoryContract}
                     ipfs={ipfs} />
             </TabPanel>
             <TabPanel value={value} index={2}>
                 <EthBalance
                     accounts={accounts}
-                    nftFractionsDexContract={nftFractionsDexContract} />
+                    dexContract={dexContract} />
             </TabPanel>
 
             <DepositNft
                 web3={web3}
                 accounts={accounts}
-                nftFractionsDexContract={nftFractionsDexContract}
+                nftFractionsRepositoryContract={nftFractionsRepositoryContract}
                 nftDepositDialogOpen={nftDepositDialogOpen}
                 setNftDepositDialogOpen={setNftDepositDialogOpen} />
         </>

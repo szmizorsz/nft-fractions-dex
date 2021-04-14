@@ -8,7 +8,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import ERC721 from '../../contracts/ERC721.json';
 
-const DepositNft = ({ web3, accounts, nftFractionsDexContract, nftDepositDialogOpen, setNftDepositDialogOpen }) => {
+const DepositNft = ({ web3, accounts, nftFractionsRepositoryContract, nftDepositDialogOpen, setNftDepositDialogOpen }) => {
     const defaultDialogContentText = 'Please, specify the contract address and the token id of your NFT along with the amount of shares that you want to create! Before the deposit the system will ask your allowance to transfer the NFT.';
     const [dialogContentText, setDialogContentText] = React.useState(defaultDialogContentText);
 
@@ -22,8 +22,8 @@ const DepositNft = ({ web3, accounts, nftFractionsDexContract, nftDepositDialogO
             from: accounts[0]
         }
         const erc721contract = new web3.eth.Contract(ERC721.abi, originalContract);
-        await erc721contract.methods.approve(nftFractionsDexContract._address, originalTokenId).send(config);
-        await nftFractionsDexContract.methods.depositNft(originalContract, originalTokenId, fractionsAmount).send(config);
+        await erc721contract.methods.approve(nftFractionsRepositoryContract._address, originalTokenId).send(config);
+        await nftFractionsRepositoryContract.methods.depositNft(originalContract, originalTokenId, fractionsAmount).send(config);
 
         handleCloseWithDialogContentTextReset();
     };

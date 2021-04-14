@@ -8,20 +8,21 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Web3 from 'web3';
 
-const DepositEthDialog = ({ accounts, nftFractionsDexContract, ethDepositDialogOpen, setEthDepositDialogOpen }) => {
+const DepositEthDialog = ({ accounts, dexContract, ethDepositDialogOpen, setEthDepositDialogOpen }) => {
     const defaultDialogContentText = 'Please, specify the amount (ETH) to deposit.';
     const [dialogContentText, setDialogContentText] = React.useState(defaultDialogContentText);
 
     const [amount, setAmount] = React.useState('');
 
     const handleSubmit = async () => {
+        debugger
         const weiAmount = Web3.utils.toWei(amount.toString(), 'ether');
         let config = {
             gas: GAS_LIMIT,
             from: accounts[0],
             value: weiAmount
         }
-        await nftFractionsDexContract.methods.depositEth().send(config);
+        await dexContract.methods.depositEth().send(config);
         handleClose();
     };
 

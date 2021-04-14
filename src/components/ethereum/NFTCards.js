@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const NFTCards = ({ nftList, nftFractionsDexContract, accounts }) => {
+const NFTCards = ({ nftList, nftFractionsRepositoryContract, accounts }) => {
     const classes = useStyles();
 
     const handleWithdrawSubmit = async (tokenId) => {
@@ -30,7 +30,7 @@ const NFTCards = ({ nftList, nftFractionsDexContract, accounts }) => {
             gas: GAS_LIMIT,
             from: accounts[0]
         }
-        await nftFractionsDexContract.methods.withdrawNft(tokenId).send(config);
+        await nftFractionsRepositoryContract.methods.withdrawNft(tokenId).send(config);
     };
 
     const withdrawButtonDisplay = (myShares, totalShares, tokenId, row) => {

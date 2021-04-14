@@ -6,14 +6,14 @@ import WithdrawEthDialog from './WithdrawEthDialog.js';
 import { Button } from '@material-ui/core/'
 import Web3 from 'web3';
 
-const EthBalance = ({ accounts, nftFractionsDexContract }) => {
+const EthBalance = ({ accounts, dexContract }) => {
     const [ethBalance, setEthBalance] = useState(0);
     const [ethDepositDialogOpen, setEthDepositDialogOpen] = useState(false);
     const [ethWithdrawDialogOpen, setEthWithdrawDialogOpen] = useState(false);
 
     useEffect(() => {
         const loadEthBalance = async () => {
-            let ethBalanceFromChain = await nftFractionsDexContract.methods.getEthBalance(accounts[0]).call();
+            let ethBalanceFromChain = await dexContract.methods.getEthBalance(accounts[0]).call();
             ethBalanceFromChain = Web3.utils.fromWei(ethBalanceFromChain, 'ether');
             setEthBalance(ethBalanceFromChain);
         }
@@ -41,13 +41,13 @@ const EthBalance = ({ accounts, nftFractionsDexContract }) => {
             </Button>
             <DepositEthDialog
                 accounts={accounts}
-                nftFractionsDexContract={nftFractionsDexContract}
+                dexContract={dexContract}
                 ethDepositDialogOpen={ethDepositDialogOpen}
                 setEthDepositDialogOpen={setEthDepositDialogOpen} />
             <WithdrawEthDialog
                 ethBalance={ethBalance}
                 accounts={accounts}
-                nftFractionsDexContract={nftFractionsDexContract}
+                dexContract={dexContract}
                 ethWithdrawDialogOpen={ethWithdrawDialogOpen}
                 setEthWithdrawDialogOpen={setEthWithdrawDialogOpen} />
         </>

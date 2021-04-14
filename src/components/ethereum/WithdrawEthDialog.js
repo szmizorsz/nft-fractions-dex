@@ -9,7 +9,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Web3 from 'web3';
 import Alert from '@material-ui/lab/Alert';
 
-const WithdrawEthDialog = ({ ethBalance, accounts, nftFractionsDexContract, ethWithdrawDialogOpen, setEthWithdrawDialogOpen }) => {
+const WithdrawEthDialog = ({ ethBalance, accounts, dexContract, ethWithdrawDialogOpen, setEthWithdrawDialogOpen }) => {
     const defaultDialogContentText = 'Please, specify the amount (ETH) to withdraw.';
     const [dialogContentText, setDialogContentText] = React.useState(defaultDialogContentText);
 
@@ -26,7 +26,7 @@ const WithdrawEthDialog = ({ ethBalance, accounts, nftFractionsDexContract, ethW
             gas: GAS_LIMIT,
             from: accounts[0]
         }
-        await nftFractionsDexContract.methods.withdrawEth(weiAmount).send(config);
+        await dexContract.methods.withdrawEth(weiAmount).send(config);
         handleCloseWithDialogContentTextReset();
     };
 
