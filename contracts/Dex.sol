@@ -24,6 +24,16 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
         uint256 date;
     }
 
+    event NewTrade(
+        uint256 orderId,
+        uint256 indexed tokenId,
+        address indexed trader1,
+        address indexed trader2,
+        uint256 amount,
+        uint256 price,
+        uint256 date
+    );
+
     CountersUpgradeable.Counter private _orderIds;
     mapping(address => uint256) ethBalance;
     mapping(uint256 => mapping(uint256 => Order[])) orderBook;
@@ -48,6 +58,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
      * @dev deposit ETH for trading
      */
     function depositEth() public payable {
+        require(!paused(), "Not allowed while paused");
         ethBalance[msg.sender] += msg.value;
     }
 
@@ -58,6 +69,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
      * - msg.sender has to have equal or more ETH than the amount to withdraw
      */
     function withdrawEth(uint256 amount) public {
+        require(!paused(), "Not allowed while paused");
         require(ethBalance[msg.sender] >= amount, "ETH balance is not enough");
         ethBalance[msg.sender] -= amount;
         payable(msg.sender).transfer(amount);
@@ -80,6 +92,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
         uint256 price,
         Side side
     ) external tokenExist(tokenId) {
+        require(!paused(), "Not allowed while paused");
         if (side == Side.SELL) {
             uint256 sendersBalance =
                 nftFractionsRepository.balanceOf(msg.sender, tokenId);
@@ -133,6 +146,80 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
             orders[i - 1] = orders[i];
             orders[i] = order;
             i--;
+        }
+    }
+
+    function createMarketOrder(
+        uint256 tokenId,
+        uint256 amount,
+        Side side
+    ) external tokenExist(tokenId) {
+        require(!paused(), "Not allowed while paused");
+        if (side == Side.SELL) {
+            uint256 sendersBalance =
+                nftFractionsRepository.balanceOf(msg.sender, tokenId);
+            require(
+                sendersBalance >= amount,
+                "message sender's token balance is too low"
+            );
+        }
+        Order[] storage orders =
+            orderBook[tokenId][
+                uint256(side == Side.BUY ? Side.SELL : Side.BUY)
+            ];
+        uint256 i;
+        uint256 remaining = amount;
+
+        while (i < orders.length && remaining > 0) {
+            uint256 available = orders[i].amount - orders[i].filled;
+            uint256 matched = (remaining > available) ? available : remaining;
+            remaining = remaining - matched;
+            orders[i].filled = orders[i].filled + matched;
+            emit NewTrade(
+                orders[i].id,
+                tokenId,
+                orders[i].trader,
+                msg.sender,
+                matched,
+                orders[i].price,
+                block.timestamp
+            );
+            if (side == Side.SELL) {
+                nftFractionsRepository.safeTransferFrom(
+                    msg.sender,
+                    orders[i].trader,
+                    tokenId,
+                    matched,
+                    ""
+                );
+                ethBalance[msg.sender] += orders[i].price * matched;
+                ethBalance[orders[i].trader] -= orders[i].price * matched;
+            }
+            if (side == Side.BUY) {
+                require(
+                    ethBalance[msg.sender] >= orders[i].price * matched,
+                    "eth balance too low"
+                );
+                nftFractionsRepository.safeTransferFrom(
+                    orders[i].trader,
+                    msg.sender,
+                    tokenId,
+                    matched,
+                    ""
+                );
+                ethBalance[msg.sender] -= orders[i].price * matched;
+                ethBalance[orders[i].trader] += orders[i].price * matched;
+            }
+            i++;
+        }
+
+        i = 0;
+        while (i < orders.length && orders[i].filled == orders[i].amount) {
+            for (uint256 j = i; j < orders.length - 1; j++) {
+                orders[j] = orders[j + 1];
+            }
+            orders.pop();
+            i++;
         }
     }
 

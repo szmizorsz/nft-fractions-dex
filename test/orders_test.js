@@ -4,7 +4,7 @@ const Dex = artifacts.require("Dex");
 const truffleAssert = require("truffle-assertions");
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
-contract("Dex", async function (accounts) {
+contract("Dex orders", async function (accounts) {
     let nftFractionsRepositoryInstance;
     let erc721MockInstance;
     let dexInstance;
@@ -21,6 +21,7 @@ contract("Dex", async function (accounts) {
         await nftFractionsRepositoryInstance.depositNft(erc721MockInstance.address, erc721TokenId, fractionsAmount, { from: nftOwner });
         dexInstance = await deployProxy(Dex, []);
         dexInstance.setNftFractionsRepository(nftFractionsRepositoryInstance.address);
+        await nftFractionsRepositoryInstance.setApprovalForAll(dexInstance.address, true, { from: nftOwner });
     });
 
     it("should create sell limit order", async function () {
@@ -114,6 +115,193 @@ contract("Dex", async function (accounts) {
         await truffleAssert.reverts(
             dexInstance.createLimitOrder(erc1155TokenId, amount, price, buySide, { from: buyer }),
             "total amount of fractions is lower than the given amount");
+    });
+
+    it("should create sell market order and match to one buy limit order", async function () {
+        let buyer = accounts[2];
+        let ethDeposit = 200;
+        await dexInstance.depositEth({ from: buyer, value: ethDeposit });
+
+        let amount = 50;
+        let price = 2;
+        let buySide = 0;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount, price, buySide, { from: buyer });
+        let sellSide = 1;
+        let sellAmount = 40;
+        let result = await dexInstance.createMarketOrder(erc1155TokenId, sellAmount, sellSide, { from: nftOwner });
+
+        truffleAssert.eventEmitted(result, 'NewTrade');
+        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
+            return e.orderId.toNumber() === 1
+                && e.tokenId.toNumber() === erc1155TokenId
+                && e.trader1 === buyer
+                && e.trader2 === nftOwner
+                && e.amount.toNumber() === sellAmount
+                && e.price.toNumber() === price;
+        }, 'event params incorrect');
+
+        let orders = await dexInstance.getOrders(erc1155TokenId, buySide);
+        assert(orders.length == 1);
+        assert(orders[0].id == 1);
+        assert(orders[0].amount == amount);
+        assert(orders[0].price == price);
+        assert(orders[0].side == buySide);
+        assert(orders[0].trader == buyer);
+        assert(orders[0].tokenId == erc1155TokenId);
+        assert(orders[0].filled == sellAmount);
+    });
+
+    it("should create sell market order and match to two buy limit orders", async function () {
+        let buyer = accounts[2];
+        let ethDeposit = 2000;
+        await dexInstance.depositEth({ from: buyer, value: ethDeposit });
+
+        let amount1 = 50;
+        let price1 = 3;
+        let buySide = 0;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount1, price1, buySide, { from: buyer });
+        let amount2 = 40;
+        let price2 = 2;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount2, price2, buySide, { from: buyer });
+        let sellSide = 1;
+        let sellAmount = 80;
+        let result = await dexInstance.createMarketOrder(erc1155TokenId, sellAmount, sellSide, { from: nftOwner });
+
+        truffleAssert.eventEmitted(result, 'NewTrade');
+        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
+            return e.orderId.toNumber() === 1
+                && e.tokenId.toNumber() === erc1155TokenId
+                && e.trader1 === buyer
+                && e.trader2 === nftOwner
+                && e.amount.toNumber() === amount1
+                && e.price.toNumber() === price1;
+        }, 'event params incorrect');
+        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
+            return e.orderId.toNumber() === 2
+                && e.tokenId.toNumber() === erc1155TokenId
+                && e.trader1 === buyer
+                && e.trader2 === nftOwner
+                && e.amount.toNumber() === 30
+                && e.price.toNumber() === price2;
+        }, 'event params incorrect');
+
+        let orders = await dexInstance.getOrders(erc1155TokenId, buySide);
+        assert(orders.length == 1);
+        assert(orders[0].id == 2);
+        assert(orders[0].amount == amount2);
+        assert(orders[0].price == price2);
+        assert(orders[0].side == buySide);
+        assert(orders[0].trader == buyer);
+        assert(orders[0].tokenId == erc1155TokenId);
+        assert(orders[0].filled == 30);
+    });
+
+    it("should create buy market order and match to one sell limit order", async function () {
+        let buyer = accounts[2];
+        let ethDeposit = 200;
+        await dexInstance.depositEth({ from: buyer, value: ethDeposit });
+
+        let amount = 50;
+        let price = 2;
+        let sellSide = 1;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount, price, sellSide, { from: nftOwner });
+        let buySide = 0;
+        let buyAmount = 40;
+        let result = await dexInstance.createMarketOrder(erc1155TokenId, buyAmount, buySide, { from: buyer });
+
+        truffleAssert.eventEmitted(result, 'NewTrade');
+        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
+            return e.orderId.toNumber() === 1
+                && e.tokenId.toNumber() === erc1155TokenId
+                && e.trader1 === nftOwner
+                && e.trader2 === buyer
+                && e.amount.toNumber() === buyAmount
+                && e.price.toNumber() === price;
+        }, 'event params incorrect');
+
+        let orders = await dexInstance.getOrders(erc1155TokenId, sellSide);
+        assert(orders.length == 1);
+        assert(orders[0].id == 1);
+        assert(orders[0].amount == amount);
+        assert(orders[0].price == price);
+        assert(orders[0].side == sellSide);
+        assert(orders[0].trader == nftOwner);
+        assert(orders[0].tokenId == erc1155TokenId);
+        assert(orders[0].filled == buyAmount);
+    });
+
+    it("should create buy market order and match fully to one sell limit order", async function () {
+        let buyer = accounts[2];
+        let ethDeposit = 200;
+        await dexInstance.depositEth({ from: buyer, value: ethDeposit });
+
+        let amount = 50;
+        let price = 2;
+        let sellSide = 1;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount, price, sellSide, { from: nftOwner });
+        let buySide = 0;
+        let buyAmount = 60;
+        let result = await dexInstance.createMarketOrder(erc1155TokenId, buyAmount, buySide, { from: buyer });
+
+        truffleAssert.eventEmitted(result, 'NewTrade');
+        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
+            return e.orderId.toNumber() === 1
+                && e.tokenId.toNumber() === erc1155TokenId
+                && e.trader1 === nftOwner
+                && e.trader2 === buyer
+                && e.amount.toNumber() === amount
+                && e.price.toNumber() === price;
+        }, 'event params incorrect');
+
+        let orders = await dexInstance.getOrders(erc1155TokenId, sellSide);
+        assert(orders.length == 0);
+        orders = await dexInstance.getOrders(erc1155TokenId, buySide);
+        assert(orders.length == 0);
+    });
+
+    it("should create buy market order and match to two sell limit order", async function () {
+        let buyer = accounts[2];
+        let ethDeposit = 2000;
+        await dexInstance.depositEth({ from: buyer, value: ethDeposit });
+
+        let amount = 50;
+        let price = 2;
+        let sellSide = 1;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount, price, sellSide, { from: nftOwner });
+        let amount2 = 60;
+        let price2 = 3;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount2, price2, sellSide, { from: nftOwner });
+        let buySide = 0;
+        let buyAmount = 90;
+        let result = await dexInstance.createMarketOrder(erc1155TokenId, buyAmount, buySide, { from: buyer });
+
+        truffleAssert.eventEmitted(result, 'NewTrade');
+        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
+            return e.orderId.toNumber() === 1
+                && e.tokenId.toNumber() === erc1155TokenId
+                && e.trader1 === nftOwner
+                && e.trader2 === buyer
+                && e.amount.toNumber() === amount
+                && e.price.toNumber() === price;
+        }, 'event params incorrect');
+        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
+            return e.orderId.toNumber() === 2
+                && e.tokenId.toNumber() === erc1155TokenId
+                && e.trader1 === nftOwner
+                && e.trader2 === buyer
+                && e.amount.toNumber() === 40
+                && e.price.toNumber() === price2;
+        }, 'event params incorrect');
+
+        let orders = await dexInstance.getOrders(erc1155TokenId, sellSide);
+        assert(orders.length == 1);
+        assert(orders[0].id == 2);
+        assert(orders[0].amount == amount2);
+        assert(orders[0].price == price2);
+        assert(orders[0].side == sellSide);
+        assert(orders[0].trader == nftOwner);
+        assert(orders[0].tokenId == erc1155TokenId);
+        assert(orders[0].filled == 40);
     });
 });
 

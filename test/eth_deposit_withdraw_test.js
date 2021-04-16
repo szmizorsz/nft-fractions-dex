@@ -3,7 +3,7 @@ const Dex = artifacts.require("Dex");
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 const truffleAssert = require("truffle-assertions");
 
-contract("Dex", async function (accounts) {
+contract("Dex eth deposits and withdrawals", async function (accounts) {
     let nftFractionsRepositoryInstance;
     let dexInstance;
     let ethOwner = accounts[8];
