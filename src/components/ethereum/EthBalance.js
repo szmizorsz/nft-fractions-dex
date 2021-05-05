@@ -18,6 +18,7 @@ const EthBalance = ({ accounts, dexContract }) => {
             setEthBalance(ethBalanceFromChain);
         }
         loadEthBalance();
+        // eslint-disable-next-line
     }, []);
 
     return (

@@ -10,6 +10,12 @@ import Box from '@material-ui/core/Box';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import { GAS_LIMIT } from '../../config/settings.js'
+import { Link } from "react-router-dom";
+import {
+    Switch,
+    Route
+} from "react-router-dom";
+import NFTDetail from "./NFTDetail.js";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -59,7 +65,7 @@ const NFTCards = ({ nftList, nftFractionsRepositoryContract, accounts }) => {
                                 </Box>
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="h2">
-                                        {row.name}
+                                        <Link to={`/ethereum/nft/${row.tokenId}`}>{row.name}</Link>
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary" component="p">
                                         {row.description}
@@ -78,6 +84,12 @@ const NFTCards = ({ nftList, nftFractionsRepositoryContract, accounts }) => {
                     </Box>
                 </Grid>
             ))}
+            <Switch>
+                <Route path="/ethereum/nft/:tokenId" exact>
+                    <NFTDetail />
+                </Route>
+
+            </Switch>
         </Grid>
     );
 

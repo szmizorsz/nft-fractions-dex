@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import getWeb3 from "../../util/getWeb3";
-import NftFractionsRepository from '../../contracts/NftFractionsRepository.json';
-import Dex from '../../contracts/Dex.json';
+import React, { useState } from 'react';
 import Box from '@material-ui/core/Box'
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -9,8 +6,6 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import MyNFTs from './MyNFTs.js'
 import AllNFTs from './AllNFTs.js'
-import ipfsClient from "ipfs-http-client";
-import { IPFS } from '../../config/settings'
 import { Button } from '@material-ui/core/'
 import DepositNft from './DepositNft.js'
 import Grid from '@material-ui/core/Grid';
@@ -87,12 +82,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const LandingPage = () => {
-    const [web3, setWeb3] = useState(undefined);
-    const [accounts, setAccounts] = useState(undefined);
-    const [nftFractionsRepositoryContract, setNftFractionsRepositoryContract] = useState(undefined);
-    const [dexContract, setDexContract] = useState(undefined);
-    const [ipfs] = useState(ipfsClient({ host: IPFS.HOST, port: IPFS.PORT, protocol: IPFS.PROTOCOL }));
+const LandingPage = ({ web3, accounts, nftFractionsRepositoryContract, dexContract, ipfs }) => {
     const [nftDepositDialogOpen, setNftDepositDialogOpen] = useState(false);
 
     const classes = useStyles();
@@ -100,44 +90,6 @@ const LandingPage = () => {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-
-    useEffect(() => {
-        const init = async () => {
-            const web3 = await getWeb3();
-            const accounts = await web3.eth.getAccounts();
-            const networkId = await web3.eth.net.getId();
-            let deployedNetwork = NftFractionsRepository.networks[networkId];
-            const nftFractionsRepositoryContract = new web3.eth.Contract(
-                NftFractionsRepository.abi,
-                deployedNetwork && deployedNetwork.address,
-            );
-            deployedNetwork = Dex.networks[networkId];
-            const dexContract = new web3.eth.Contract(
-                Dex.abi,
-                deployedNetwork && deployedNetwork.address,
-            );
-            setWeb3(web3);
-            setAccounts(accounts);
-            setNftFractionsRepositoryContract(nftFractionsRepositoryContract);
-            setDexContract(dexContract);
-        }
-        init();
-        window.ethereum.on('accountsChanged', accounts => {
-            setAccounts(accounts);
-        });
-    }, []);
-
-    const isReady = () => {
-        return (
-            typeof nftFractionsRepositoryContract !== 'undefined'
-            && typeof web3 !== 'undefined'
-            && typeof accounts !== 'undefined'
-        );
-    }
-
-    if (!isReady()) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <>
@@ -192,9 +144,10 @@ const LandingPage = () => {
                 nftFractionsRepositoryContract={nftFractionsRepositoryContract}
                 nftDepositDialogOpen={nftDepositDialogOpen}
                 setNftDepositDialogOpen={setNftDepositDialogOpen} />
+
+
         </>
     )
-
 }
 
 export default LandingPage;

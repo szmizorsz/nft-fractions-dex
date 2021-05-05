@@ -31,6 +31,7 @@ const MyNFTs = ({ web3, accounts, nftFractionsRepositoryContract, ipfs }) => {
             setNftList(nftsFromIpfs);
         }
         loadMyNfts();
+        // eslint-disable-next-line
     }, []);
 
     return (

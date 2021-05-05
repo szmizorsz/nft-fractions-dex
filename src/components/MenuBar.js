@@ -2,7 +2,6 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import { Link } from "react-router-dom";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -30,9 +29,9 @@ function MenuBar() {
                     <Grid item md={2}></Grid>
                     <Grid item xs={12} md={3}>
                         <Box mt={0.5}>
-                            <Link to="/">
+                            <a href="/">
                                 <img src={logo} alt="Real Estate Management Platform" className={classes.logo} />
-                            </Link>
+                            </a>
                         </Box>
                     </Grid>
                     <Grid item md={2}>
@@ -41,12 +40,16 @@ function MenuBar() {
                         <Grid container spacing={24}>
                             <Grid item md={6}>
                                 <Box mt={1.5} mr={1}>
-                                    <Button color="inherit" variant="outlined" fullWidth component={Link} target={"_blank"} to="/ethereum/landing">Open on Ethereum</Button>
+                                    <Button color="inherit" variant="outlined" fullWidth target={"_blank"}>
+                                        <a href="/ethereum/landing">Open on Ethereum</a>
+                                    </Button>
                                 </Box>
                             </Grid>
                             <Grid item md={6}>
                                 <Box mt={1.5} ml={1}>
-                                    <Button color="inherit" variant="outlined" fullWidth component={Link} to="/mortgage">Open on Binance</Button>
+                                    <Button color="inherit" variant="outlined" fullWidth >
+                                        <a href="/ethereum/landing">Open on Binance</a>
+                                    </Button>
                                 </Box>
                             </Grid>
                         </Grid>

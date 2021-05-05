@@ -1,146 +1,6 @@
 {
   "manifestVersion": "3.1",
   "impls": {
-    "c58e116fadd4289ff4fb2021b96ff0ea79d8dfc1f312980a63e161f6e57bb593": {
-      "address": "0x99816BB1F5803340e9B790fbf419Dfdd3Add103c",
-      "txHash": "0x06f539aa4c6ba10c3c49abab96a633d015e50dc05fb6bff77d7fd025a0674815",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:30"
-          },
-          {
-            "contract": "ContextUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
-          },
-          {
-            "contract": "ERC165Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:35"
-          },
-          {
-            "contract": "ERC1155Upgradeable",
-            "label": "_balances",
-            "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))",
-            "src": "../@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol:25"
-          },
-          {
-            "contract": "ERC1155Upgradeable",
-            "label": "_operatorApprovals",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
-            "src": "../@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol:28"
-          },
-          {
-            "contract": "ERC1155Upgradeable",
-            "label": "_uri",
-            "type": "t_string_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol:31"
-          },
-          {
-            "contract": "ERC1155Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)47_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol:406"
-          },
-          {
-            "contract": "PausableUpgradeable",
-            "label": "_paused",
-            "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:28"
-          },
-          {
-            "contract": "PausableUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:96"
-          },
-          {
-            "contract": "NftFractionsDex",
-            "label": "_ids",
-            "type": "t_struct(Counter)1980_storage",
-            "src": "NftFractionsDex.sol:17"
-          },
-          {
-            "contract": "NftFractionsDex",
-            "label": "originalTokens",
-            "type": "t_mapping(t_uint256,t_struct(OriginalToken)57_storage)",
-            "src": "NftFractionsDex.sol:24"
-          }
-        ],
-        "types": {
-          "t_struct(Counter)1980_storage": {
-            "label": "struct CountersUpgradeable.Counter",
-            "members": [
-              {
-                "label": "_value",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_mapping(t_uint256,t_struct(OriginalToken)57_storage)": {
-            "label": "mapping(uint256 => struct NftFractionsDex.OriginalToken)"
-          },
-          "t_struct(OriginalToken)57_storage": {
-            "label": "struct NftFractionsDex.OriginalToken",
-            "members": [
-              {
-                "label": "originalContract",
-                "type": "t_address"
-              },
-              {
-                "label": "originalTokenId",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_address": {
-            "label": "address"
-          },
-          "t_bool": {
-            "label": "bool"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
-          },
-          "t_mapping(t_uint256,t_mapping(t_address,t_uint256))": {
-            "label": "mapping(uint256 => mapping(address => uint256))"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
-            "label": "mapping(address => mapping(address => bool))"
-          },
-          "t_mapping(t_address,t_bool)": {
-            "label": "mapping(address => bool)"
-          },
-          "t_string_storage": {
-            "label": "string"
-          },
-          "t_array(t_uint256)47_storage": {
-            "label": "uint256[47]"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]"
-          }
-        }
-      }
-    },
     "65f656d17ffe72f56d7fb697c094519c0f461ce887eeab8ece79e80ab2f9089e": {
       "address": "0x75eBdACDA9660Ec33a91B982fb7f9dfF84867f55",
       "txHash": "0x5ecc18771c2123d4f5c4dfabccd4504b59538e76eea044c8ec53176f85fc7924",
@@ -3475,8 +3335,8 @@
       }
     },
     "e0baec6d1883794a9178d7e0e30a9e700f58d810f4e54de82dab4c98e66c83bd": {
-      "address": "0x5c7A3BDec2B9FE55462a9C7EafAe1CfAf6fE31A3",
-      "txHash": "0xe42c9ded5e1aec6a64afcd1e56ac4c8fdb549ce371b3ccee780baf1bad44022d",
+      "address": "0x6f422772341b70275Cacf442240702E29D0D151C",
+      "txHash": "0xdf83a507e4cf56816fa02d40662cc5c6bd7ecbd3d1adbcaed5be107e46da2b7c",
       "layout": {
         "storage": [
           {
@@ -3554,7 +3414,7 @@
           {
             "contract": "NftFractionsRepository",
             "label": "_ids",
-            "type": "t_struct(Counter)2734_storage",
+            "type": "t_struct(Counter)3077_storage",
             "src": "NftFractionsRepository.sol:26"
           },
           {
@@ -3566,7 +3426,7 @@
           {
             "contract": "NftFractionsRepository",
             "label": "tokens",
-            "type": "t_mapping(t_uint256,t_struct(Token)513_storage)",
+            "type": "t_mapping(t_uint256,t_struct(Token)856_storage)",
             "src": "NftFractionsRepository.sol:28"
           },
           {
@@ -3577,7 +3437,7 @@
           }
         ],
         "types": {
-          "t_struct(Counter)2734_storage": {
+          "t_struct(Counter)3077_storage": {
             "label": "struct CountersUpgradeable.Counter",
             "members": [
               {
@@ -3598,10 +3458,10 @@
           "t_array(t_uint256)dyn_storage": {
             "label": "uint256[]"
           },
-          "t_mapping(t_uint256,t_struct(Token)513_storage)": {
+          "t_mapping(t_uint256,t_struct(Token)856_storage)": {
             "label": "mapping(uint256 => struct NftFractionsRepository.Token)"
           },
-          "t_struct(Token)513_storage": {
+          "t_struct(Token)856_storage": {
             "label": "struct NftFractionsRepository.Token",
             "members": [
               {
@@ -4126,8 +3986,8 @@
       }
     },
     "4c002deddc8a4c7284d81fc0eeb350d87aa8f7606a02c770db7ce6fb9c437418": {
-      "address": "0xb9dae4dE0B1A6bEEdc0F88Fd10ba17265257E983",
-      "txHash": "0x0ffe27a818bc44dd2bbe122c127539865fc2e2eef179f9d00cf0fabee1fecfe9",
+      "address": "0x99816BB1F5803340e9B790fbf419Dfdd3Add103c",
+      "txHash": "0x3211a04863e7432b7f4fb22768d139641495569a071c74a80f3fe491a3e7dd6a",
       "layout": {
         "storage": [
           {
@@ -4286,7 +4146,7 @@
     }
   },
   "admin": {
-    "address": "0x9C4Ef7C76525fde32dbE9255B013Aaee4DFB61ca",
-    "txHash": "0x81a508a64e0c857d86baf3ca12d408978d74e16537e94a8ee6daf322d5f6dff2"
+    "address": "0x64B0dF8CBDA97Af0D9E67d0679B4E5653f43b0BA",
+    "txHash": "0x0bf790778ccaecff138c0e6be04b31c061d398cde13d6fa87e58fbd0b37c8168"
   }
 }
