@@ -185,7 +185,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
                 block.timestamp
             );
             if (side == Side.SELL) {
-                nftFractionsRepository.safeTransferFrom(
+                nftFractionsRepository.transferFrom(
                     msg.sender,
                     orders[i].trader,
                     tokenId,
@@ -200,7 +200,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
                     ethBalance[msg.sender] >= orders[i].price * matched,
                     "eth balance too low"
                 );
-                nftFractionsRepository.safeTransferFrom(
+                nftFractionsRepository.transferFrom(
                     orders[i].trader,
                     msg.sender,
                     tokenId,

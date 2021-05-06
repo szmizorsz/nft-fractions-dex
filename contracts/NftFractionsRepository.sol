@@ -24,8 +24,13 @@ contract NftFractionsRepository is
     }
 
     CountersUpgradeable.Counter private _ids;
-    mapping(address => uint256[]) tokenIdsByShareOwner;
     mapping(uint256 => Token) tokens;
+    // data structures to keep track of:
+    // tokenIds by owner:
+    mapping(address => uint256[]) tokenIdsByShareOwner;
+    // owners by tokenId:
+    mapping(uint256 => address[]) ownersByTokenId;
+    // all tokenIds:
     uint256[] tokenIds;
 
     function initialize(string memory uri_) public initializer {
@@ -67,6 +72,7 @@ contract NftFractionsRepository is
         token.totalFractionsAmount = fractionsAmountToMint;
         tokens[newItemId] = token;
         tokenIdsByShareOwner[msg.sender].push(newItemId);
+        ownersByTokenId[newItemId].push(msg.sender);
         tokenIds.push(newItemId);
     }
 
@@ -97,19 +103,7 @@ contract NftFractionsRepository is
         //burns the ERC1155 token
         _burn(msg.sender, tokenId, totalFractionsAmount);
         //deletes the ERC1155 token from the tokenIdsByShareOwner array
-        uint256 nrOfTokensByShareOwner =
-            tokenIdsByShareOwner[msg.sender].length;
-        uint256 tokenIdPositionInShareOwner;
-        for (uint256 i; i < nrOfTokensByShareOwner; i++) {
-            if (tokenId == tokenIdsByShareOwner[msg.sender][i]) {
-                tokenIdPositionInShareOwner = i;
-                break;
-            }
-        }
-        tokenIdsByShareOwner[msg.sender][
-            tokenIdPositionInShareOwner
-        ] = tokenIdsByShareOwner[msg.sender][nrOfTokensByShareOwner - 1];
-        tokenIdsByShareOwner[msg.sender].pop();
+        deleteIdFromTokenIdsByShareOwner(msg.sender, tokenId);
         //deletes the ERC1155 token from the tokenIds array
         uint256 nrOfTokens = tokenIds.length;
         uint256 tokenIdPosition;
@@ -121,8 +115,49 @@ contract NftFractionsRepository is
         }
         tokenIds[tokenIdPosition] = tokenIds[nrOfTokens - 1];
         tokenIds.pop();
+        //deletes the token from the owners mapping
+        delete ownersByTokenId[tokenId];
         //deletes the token struct
         delete tokens[tokenId];
+    }
+
+    /**
+     * @dev same as safeTransferFrom in ERC1155 with updating the internal data structures:
+     * - updates the ownersByTokenId data structure
+     * - updates the tokenIdsByShareOwner data structure
+     */
+    function transferFrom(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) public {
+        require(!paused(), "Not allowed while paused");
+        uint256 fromBalanceBefore = balanceOf(from, id);
+        uint256 toBalanceBefore = balanceOf(to, id);
+        safeTransferFrom(from, to, id, amount, data);
+        if (amount >= fromBalanceBefore) {
+            // remove the tokenId from ownersByTokenId[tokenId][from]
+            uint256 nrOfOwners = ownersByTokenId[id].length;
+            uint256 ownerPosition;
+            for (uint256 i; i < nrOfOwners; i++) {
+                if (from == ownersByTokenId[id][i]) {
+                    ownerPosition = i;
+                    break;
+                }
+            }
+            ownersByTokenId[id][ownerPosition] = ownersByTokenId[id][
+                nrOfOwners - 1
+            ];
+            ownersByTokenId[id].pop();
+            // delete the tokenId from the tokenIdsByShareOwner array
+            deleteIdFromTokenIdsByShareOwner(from, id);
+        }
+        if (toBalanceBefore == 0) {
+            ownersByTokenId[id].push(to);
+            tokenIdsByShareOwner[to].push(id);
+        }
     }
 
     /**
@@ -163,9 +198,40 @@ contract NftFractionsRepository is
     }
 
     /**
+     * @dev returns the owners of a token
+     */
+    function getOwnersBYtokenId(uint256 tokenId)
+        public
+        view
+        returns (address[] memory)
+    {
+        return ownersByTokenId[tokenId];
+    }
+
+    /**
      * @dev returns all ERC1155 tokenIds managed by this contract
      */
     function getTokenIds() public view returns (uint256[] memory) {
         return tokenIds;
+    }
+
+    /**
+     * @dev helper to delete a tokenId from tokenIdsByShareOwner
+     */
+    function deleteIdFromTokenIdsByShareOwner(address owner, uint256 id)
+        private
+    {
+        uint256 nrOfTokensByShareOwner = tokenIdsByShareOwner[owner].length;
+        uint256 tokenIdPositionInShareOwner;
+        for (uint256 i; i < nrOfTokensByShareOwner; i++) {
+            if (id == tokenIdsByShareOwner[owner][i]) {
+                tokenIdPositionInShareOwner = i;
+                break;
+            }
+        }
+        tokenIdsByShareOwner[owner][
+            tokenIdPositionInShareOwner
+        ] = tokenIdsByShareOwner[owner][nrOfTokensByShareOwner - 1];
+        tokenIdsByShareOwner[owner].pop();
     }
 }

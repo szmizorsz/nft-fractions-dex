@@ -72,19 +72,30 @@ contract("NftFractionsRepository", async function (accounts) {
 		await erc721MockInstance.mint(nftOwner, erc721TokenId2);
 		await erc721MockInstance.approve(nftFractionsRepositoryInstance.address, erc721TokenId2, { from: nftOwner });
 		await nftFractionsRepositoryInstance.depositNft(erc721MockInstance.address, erc721TokenId2, fractionsAmount, { from: nftOwner });
+
+		let tokenIds = await nftFractionsRepositoryInstance.getTokenIdsByShareOwner(nftOwner);
+		let expectedTokenIds = [1, 2];
+		tokenIds = tokenIds.map(item => item.toNumber())
+		expect(tokenIds).to.have.same.members(expectedTokenIds);
+
 		let erc1155tokenIdToWithdraw = 1;
 		await nftFractionsRepositoryInstance.withdrawNft(erc1155tokenIdToWithdraw, { from: nftOwner });
+
 		let ownerAfterWithdraw = await erc721MockInstance.ownerOf(erc721TokenId);
 		assert(ownerAfterWithdraw === nftOwner);
+
 		let erc1155Balance = await nftFractionsRepositoryInstance.balanceOf(nftOwner, erc1155tokenIdToWithdraw);
 		assert(erc1155Balance.toNumber() === 0);
+
 		let deletedTokenData = await nftFractionsRepositoryInstance.getTokenData(erc1155tokenIdToWithdraw);
 		assert(deletedTokenData.erc721ContractAddress === "0x0000000000000000000000000000000000000000");
 		assert(deletedTokenData.erc721TokenId.toNumber() === 0);
 		assert(deletedTokenData.totalFractionsAmount.toNumber() === 0);
+
 		let ownersTokens = await nftFractionsRepositoryInstance.getTokenIdsByShareOwner(nftOwner);
 		ownersTokens = ownersTokens.map(item => item.toNumber());
 		expect(ownersTokens).to.have.same.members([2]);
+
 		let allTokens = await nftFractionsRepositoryInstance.getTokenIds();
 		allTokens = allTokens.map(item => item.toNumber());
 		expect(allTokens).to.have.same.members([2]);

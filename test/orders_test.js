@@ -122,6 +122,10 @@ contract("Dex orders", async function (accounts) {
         let ethDeposit = 200;
         await dexInstance.depositEth({ from: buyer, value: ethDeposit });
 
+        let ownersBefore = await nftFractionsRepositoryInstance.getOwnersBYtokenId(erc1155TokenId);
+        assert(ownersBefore.length == 1);
+        assert(ownersBefore[0] == nftOwner);
+
         let amount = 50;
         let price = 2;
         let buySide = 0;
@@ -149,6 +153,15 @@ contract("Dex orders", async function (accounts) {
         assert(orders[0].trader == buyer);
         assert(orders[0].tokenId == erc1155TokenId);
         assert(orders[0].filled == sellAmount);
+
+        let ownersAfter = await nftFractionsRepositoryInstance.getOwnersBYtokenId(erc1155TokenId);
+        assert(ownersAfter.length == 2);
+        assert(ownersAfter[0] == nftOwner);
+        assert(ownersAfter[1] == buyer);
+        let originalOwnerBalance = await nftFractionsRepositoryInstance.balanceOf(nftOwner, erc1155TokenId);
+        assert(originalOwnerBalance.toNumber() === 60);
+        let buyerBalance = await nftFractionsRepositoryInstance.balanceOf(buyer, erc1155TokenId);
+        assert(buyerBalance.toNumber() === 40);
     });
 
     it("should create sell market order and match to two buy limit orders", async function () {
@@ -302,6 +315,47 @@ contract("Dex orders", async function (accounts) {
         assert(orders[0].trader == nftOwner);
         assert(orders[0].tokenId == erc1155TokenId);
         assert(orders[0].filled == 40);
+    });
+
+    it("should create buy market order and match fully to one sell limit order which transfers the whole ownership", async function () {
+        let buyer = accounts[2];
+        let ethDeposit = 200;
+        await dexInstance.depositEth({ from: buyer, value: ethDeposit });
+
+        let ownersBefore = await nftFractionsRepositoryInstance.getOwnersBYtokenId(erc1155TokenId);
+        assert(ownersBefore.length == 1);
+        assert(ownersBefore[0] == nftOwner);
+
+        let amount = 100;
+        let price = 2;
+        let sellSide = 1;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount, price, sellSide, { from: nftOwner });
+        let buySide = 0;
+        let buyAmount = 100;
+        let result = await dexInstance.createMarketOrder(erc1155TokenId, buyAmount, buySide, { from: buyer });
+
+        truffleAssert.eventEmitted(result, 'NewTrade');
+        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
+            return e.orderId.toNumber() === 1
+                && e.tokenId.toNumber() === erc1155TokenId
+                && e.trader1 === nftOwner
+                && e.trader2 === buyer
+                && e.amount.toNumber() === amount
+                && e.price.toNumber() === price;
+        }, 'event params incorrect');
+
+        let orders = await dexInstance.getOrders(erc1155TokenId, sellSide);
+        assert(orders.length == 0);
+        orders = await dexInstance.getOrders(erc1155TokenId, buySide);
+        assert(orders.length == 0);
+
+        let ownersAfter = await nftFractionsRepositoryInstance.getOwnersBYtokenId(erc1155TokenId);
+        assert(ownersAfter.length == 1);
+        assert(ownersAfter[0] == buyer);
+        let originalOwnerBalance = await nftFractionsRepositoryInstance.balanceOf(nftOwner, erc1155TokenId);
+        assert(originalOwnerBalance.toNumber() === 0);
+        let buyerBalance = await nftFractionsRepositoryInstance.balanceOf(buyer, erc1155TokenId);
+        assert(buyerBalance.toNumber() === 100);
     });
 });
 
