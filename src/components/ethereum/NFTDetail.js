@@ -3,11 +3,15 @@ import { withRouter } from "react-router";
 import NFTCard from './NFTCard.js'
 import { BufferList } from "bl";
 import ERC721 from '../../contracts/ERC721.json';
+import TokenOwners from './TokenOwners.js';
+import Grid from '@material-ui/core/Grid';
 
 const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexContract, ipfs }) => {
     const { params: { tokenId } } = match;
 
     const [metaData, setMetadata] = useState(undefined);
+    const [owners, setOwners] = useState([]);
+    const [totalShares, setTotalShares] = useState(0);
 
     useEffect(() => {
         const init = async () => {
@@ -23,8 +27,19 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                 nftMetadataFromIPFS = JSON.parse(content.toString());
             }
             nftMetadataFromIPFS.tokenId = tokenId;
-            debugger
             setMetadata(nftMetadataFromIPFS);
+            setTotalShares(tokenData.totalFractionsAmount);
+            const ownersFromChain = await nftFractionsRepositoryContract.methods.getOwnersBYtokenId(tokenId).call();
+            let ownersData = [];
+            for (let owner of ownersFromChain) {
+                const ownerShares = await nftFractionsRepositoryContract.methods.balanceOf(owner, tokenId).call()
+                let ownerData = {
+                    "owner": owner,
+                    "shares": ownerShares
+                }
+                ownersData.push(ownerData);
+            }
+            setOwners(ownersData);
         }
         init();
         // eslint-disable-next-line
@@ -43,7 +58,15 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
 
     return (
         <>
-            <NFTCard name={metaData.name} image={metaData.image} description={metaData.description} />
+            <Grid container>
+                <Grid item md={3}>
+                    <NFTCard name={metaData.name} image={metaData.image} description={metaData.description} />
+                </Grid>
+                <Grid item md={1}></Grid>
+                <Grid item md={6}>
+                    <TokenOwners owners={owners} totalShares={totalShares} />
+                </Grid>
+            </Grid>
         </>
     );
 }

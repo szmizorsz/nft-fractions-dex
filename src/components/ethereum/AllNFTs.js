@@ -8,7 +8,6 @@ const AllNFTs = ({ web3, accounts, nftFractionsRepositoryContract, ipfs }) => {
 
     useEffect(() => {
         const loadNfts = async () => {
-            debugger
             const nftsFromIpfs = [];
             const tokenIds = await nftFractionsRepositoryContract.methods.getTokenIds().call();
             for (let tokenId of tokenIds) {

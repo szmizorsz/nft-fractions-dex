@@ -13,7 +13,6 @@ import {
 import NFTDetail from "./NFTDetail.js";
 
 function LoadingContainer() {
-  debugger
   const [web3, setWeb3] = useState(undefined);
   const [accounts, setAccounts] = useState(undefined);
   const [nftFractionsRepositoryContract, setNftFractionsRepositoryContract] = useState(undefined);
@@ -57,7 +56,6 @@ function LoadingContainer() {
   }
 
   if (!isReady()) {
-    debugger
     return <div>Loading...</div>;
   }
 
