@@ -1,47 +1,86 @@
-const ipfsClient = require('ipfs-http-client')
+const ipfsClient = require('ipfs-http-client');
+fs = require('fs');
 
 async function metaDataGeneration() {
     const ipfs = ipfsClient({ host: "ipfs.infura.io", port: 5001, protocol: "https" })
 
-    const metaData1 = {
-        "name": "Red hat satellite robo",
-        "description": "It can detect signals from the universe.",
-        "image": "https://robohash.org/1"
-    }
-    const file1 = await ipfs.add(Buffer.from(JSON.stringify(metaData1)));
-    console.log(file1.path);
+    fs.readFile('/Users/szabolcs/Documents/Personal/Szakmai/Ethereum/nft-fractions-dex/src/images/Eclipse2019.png', async function (err, buffer) {
+        if (err) throw err
+        const ipfsImage = await ipfs.add(buffer);
+        const image = "https://gateway.ipfs.io/ipfs/" + ipfsImage.path;
+        const metaData = {
+            "name": "Total solar eclipse 2019",
+            "description": "Solar eclipse as seen from the La Silla European Southern Observatory (ESO) in La Higuera, Coquimbo Region, Chile",
+            "image": image
+        }
+        const file = await ipfs.add(Buffer.from(JSON.stringify(metaData)));
+        console.log(file.path);
+    })
 
-    const metaData2 = {
-        "name": "Orange head robo",
-        "description": "It can scan with his eyes for miles away.",
-        "image": "https://robohash.org/2"
-    }
-    const file2 = await ipfs.add(Buffer.from(JSON.stringify(metaData2)));
-    console.log(file2.path);
+    fs.readFile('/Users/szabolcs/Documents/Personal/Szakmai/Ethereum/nft-fractions-dex/src/images/SolarEclipse2017.png', async function (err, buffer) {
+        if (err) throw err
+        const ipfsImage = await ipfs.add(buffer);
+        const image = "https://gateway.ipfs.io/ipfs/" + ipfsImage.path;
+        const metaData = {
+            "name": "Total solar eclipse 2017",
+            "description": "The moon partially covers the sun during an eclipse on Aug. 21, 2017, near Redmond, Oregon",
+            "image": image
+        }
+        const file = await ipfs.add(Buffer.from(JSON.stringify(metaData)));
+        console.log(file.path);
+    })
 
-    const metaData3 = {
-        "name": "Purple head robo",
-        "description": "It can open a can with his head.",
-        "image": "https://robohash.org/3"
-    }
-    const file3 = await ipfs.add(Buffer.from(JSON.stringify(metaData3)));
-    console.log(file3.path);
+    fs.readFile('/Users/szabolcs/Documents/Personal/Szakmai/Ethereum/nft-fractions-dex/src/images/PartialEclipseFromBangladesh.png', async function (err, buffer) {
+        if (err) throw err
+        const ipfsImage = await ipfs.add(buffer);
+        const image = "https://gateway.ipfs.io/ipfs/" + ipfsImage.path;
+        const metaData = {
+            "name": "Partial solar eclipse seen from Dhaka",
+            "description": "A partial solar eclipse is seen from Dhaka, Bangladesh in March 2016. A total eclipse followed, briefly blanketing Indonesia in total darkness.",
+            "image": image
+        }
+        const file = await ipfs.add(Buffer.from(JSON.stringify(metaData)));
+        console.log(file.path);
+    })
 
-    const metaData4 = {
-        "name": "Big purple head robo",
-        "description": "It can easily clean up with his head.",
-        "image": "https://robohash.org/4"
-    }
-    const file4 = await ipfs.add(Buffer.from(JSON.stringify(metaData4)));
-    console.log(file4.path);
+    fs.readFile('/Users/szabolcs/Documents/Personal/Szakmai/Ethereum/nft-fractions-dex/src/images/PartialEclipseKualaLumpur.png', async function (err, buffer) {
+        if (err) throw err
+        const ipfsImage = await ipfs.add(buffer);
+        const image = "https://gateway.ipfs.io/ipfs/" + ipfsImage.path;
+        const metaData = {
+            "name": "Solar eclipse is seen from Kuala Lumpur",
+            "description": "A partial solar eclipse is seen behind a star and crescent symbol above a mosque in Kuala Lumpur, Malaysia, in March 2016.",
+            "image": image
+        }
+        const file = await ipfs.add(Buffer.from(JSON.stringify(metaData)));
+        console.log(file.path);
+    })
 
-    const metaData5 = {
-        "name": "Green head robo",
-        "description": "It can dive deep into any liquid.",
-        "image": "https://robohash.org/5"
-    }
-    const file5 = await ipfs.add(Buffer.from(JSON.stringify(metaData5)));
-    console.log(file5.path);
+    fs.readFile('/Users/szabolcs/Documents/Personal/Szakmai/Ethereum/nft-fractions-dex/src/images/DangeorousEclipse.png', async function (err, buffer) {
+        if (err) throw err
+        const ipfsImage = await ipfs.add(buffer);
+        const image = "https://gateway.ipfs.io/ipfs/" + ipfsImage.path;
+        const metaData = {
+            "name": "Total eclipse combination from Tokyo",
+            "description": "This combination picture shows an annular solar eclipse seen from Tokyo on May 21, 2012",
+            "image": image
+        }
+        const file = await ipfs.add(Buffer.from(JSON.stringify(metaData)));
+        console.log(file.path);
+    })
+
+    fs.readFile('/Users/szabolcs/Documents/Personal/Szakmai/Ethereum/nft-fractions-dex/src/images/EclipseSingapore.png', async function (err, buffer) {
+        if (err) throw err
+        const ipfsImage = await ipfs.add(buffer);
+        const image = "https://gateway.ipfs.io/ipfs/" + ipfsImage.path;
+        const metaData = {
+            "name": "Eclipse combination from Singapore",
+            "description": "TA partial solar eclipse is seen behind passenger capsules of the Singapore Flyer Ferris wheel in March 2016.",
+            "image": image
+        }
+        const file = await ipfs.add(Buffer.from(JSON.stringify(metaData)));
+        console.log(file.path);
+    })
 
 }
 

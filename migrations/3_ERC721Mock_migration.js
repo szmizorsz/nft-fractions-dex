@@ -1,10 +1,11 @@
 const ERC721Mock = artifacts.require("ERC721Mock");
 const metaDataIpfsCIDs = [
-    "QmXgRrbtJ5SUXeMp62w7yfZ1Qb4vSuj3ZZQhgrjCzA1Kyh",
-    "QmSoFueamwKHKXFyM2rMLGoP9JPjrbfDUGP6D73MEGgJYP",
-    "QmQcXyVbaXDM7KAuVsvnSQ7X5X5JT7FLnsuKWeTGWY5wtk",
-    "QmTFy9g3LHqCBUTHACMoXuUriPPFgHBfCrmiyfxi3GLrMe",
-    "QmXoBg84Kup1t83y4cSKkWqepeKmu8HDsFNHGD5gGGEih9"];
+    "QmdCHKKos6F8ynn63kfHduWLxWyJY1Gx5wDQiqm2CN34Rj",
+    "QmZKXB6kZK5sFZHWzHCVQ5fmhz6q64REU2CcCfh7HfoVvM",
+    "QmdNboQAGpniYybvrVKPkZ3bmQ8BsDJTHzeY5DqGTysu9w",
+    "QmVKVfGvKdhYaVZNKJkah8riehE9KiaY7o3U1LtQY9t79C",
+    "QmfLYyPsF77QBxYpLA11NQ8kvuhZyLwtchkM6d5C2yEJcL",
+    "QmSDdTxZvvWESEEo7y376EmUy8C1BG7FVYBNyDFuh4FsDA"];
 
 module.exports = async function (deployer) {
     await deployer.deploy(ERC721Mock);
@@ -23,12 +24,16 @@ module.exports = async function (deployer) {
     await erc721MockInstance.mint(nftOwner1, originalNftTokenId3);
     await erc721MockInstance.setTokenURI(originalNftTokenId3, metaDataIpfsCIDs[2]);
 
-    const nftOwner2 = '0xA819c28d5964c4038e96A2C29EAe72A5a9E5b420';
     const originalNftTokenId4 = 4;
-    await erc721MockInstance.mint(nftOwner2, originalNftTokenId4);
+    await erc721MockInstance.mint(nftOwner1, originalNftTokenId4);
     await erc721MockInstance.setTokenURI(originalNftTokenId4, metaDataIpfsCIDs[3]);
 
+    const nftOwner2 = '0xA819c28d5964c4038e96A2C29EAe72A5a9E5b420';
     const originalNftTokenId5 = 5;
     await erc721MockInstance.mint(nftOwner2, originalNftTokenId5);
     await erc721MockInstance.setTokenURI(originalNftTokenId5, metaDataIpfsCIDs[4]);
+
+    const originalNftTokenId6 = 6;
+    await erc721MockInstance.mint(nftOwner2, originalNftTokenId6);
+    await erc721MockInstance.setTokenURI(originalNftTokenId6, metaDataIpfsCIDs[5]);
 };

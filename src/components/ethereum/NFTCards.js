@@ -20,11 +20,15 @@ import NFTDetail from "./NFTDetail.js";
 const useStyles = makeStyles((theme) => ({
 
     root: {
-        maxWidth: 300,
+        maxWidth: 400
+    },
+    card: {
+        width: "200px",
+        height: "222px"
     },
     media: {
         height: "25vh",
-        width: "25vh",
+        width: "41vh",
     },
 }));
 
@@ -52,26 +56,23 @@ const NFTCards = ({ nftList, nftFractionsRepositoryContract, accounts }) => {
     return (
         <Grid container>
             {nftList.map((row) => (
-                <Grid item xs={12} md={4} key={row.name}>
-                    <Box ml={5} mb={3} >
+                <Grid item xs={12} md={6} key={row.name}>
+                    <Box ml={5} mb={6} >
                         <Card className={classes.root} >
-                            <CardActionArea>
-                                <Box ml={1}>
+                            <Link to={`/ethereum/nft/${row.tokenId}`} style={{ textDecoration: 'none' }}>
+                                <CardActionArea>
                                     <CardMedia
                                         className={classes.media}
                                         image={row.image}
                                         title="Contemplative Reptile"
                                     />
-                                </Box>
-                                <CardContent>
-                                    <Typography gutterBottom variant="h5" component="h2">
-                                        <Link to={`/ethereum/nft/${row.tokenId}`}>{row.name}</Link>
-                                    </Typography>
-                                    <Typography variant="body2" color="textSecondary" component="p">
-                                        {row.description}
-                                    </Typography>
-                                </CardContent>
-                            </CardActionArea>
+                                    <CardContent>
+                                        <Typography gutterBottom variant="h6" component="p" color="textPrimary" >
+                                            {row.name}
+                                        </Typography>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Link>
                             <CardActions>
                                 <Box mr={2}>
                                     <Typography variant="body2" color="textSecondary" component="p">
