@@ -1,11 +1,11 @@
 const ERC721Mock = artifacts.require("ERC721Mock");
 const metaDataIpfsCIDs = [
-    "QmdCHKKos6F8ynn63kfHduWLxWyJY1Gx5wDQiqm2CN34Rj",
-    "QmZKXB6kZK5sFZHWzHCVQ5fmhz6q64REU2CcCfh7HfoVvM",
-    "QmdNboQAGpniYybvrVKPkZ3bmQ8BsDJTHzeY5DqGTysu9w",
-    "QmVKVfGvKdhYaVZNKJkah8riehE9KiaY7o3U1LtQY9t79C",
-    "QmfLYyPsF77QBxYpLA11NQ8kvuhZyLwtchkM6d5C2yEJcL",
-    "QmSDdTxZvvWESEEo7y376EmUy8C1BG7FVYBNyDFuh4FsDA"];
+    "QmWzdJBT6w6ABZ4oxFMxJaB6cpwLaWTGthTmSVWbuEenCK",
+    "QmQS7R2czx9afHR9dYnoEHhLCx7agfPT11jt1r2U6hMteH",
+    "Qmf6QNNxW5LvKmqtwQ7VmhjWnciq7LwBzDLheKWdBKvmzA",
+    "QmZ54eSPBHQYCF7szFtf7Hq89jcAhzScjUaTBCWFdLvnj3",
+    "QmQwSXhN3RXc4FS4oWPFPTemvwiaiQwLLnbgYuz2TwTR1a",
+    "QmTFhTDC8LMuHaFsyNWFgWTXJBjZ4DK9VyxbZDRePBqTB1"];
 
 module.exports = async function (deployer) {
     await deployer.deploy(ERC721Mock);

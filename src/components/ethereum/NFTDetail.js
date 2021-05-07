@@ -13,6 +13,13 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { makeStyles } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -22,7 +29,11 @@ const useStyles = makeStyles((theme) => ({
         fontSize: theme.typography.pxToRem(15),
         fontWeight: theme.typography.fontWeightRegular,
     },
+    table: {
+        minWidth: 450,
+    },
 }));
+
 const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexContract, ipfs }) => {
     const { params: { tokenId } } = match;
     const classes = useStyles();
@@ -30,6 +41,8 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
     const [metaData, setMetadata] = useState(undefined);
     const [owners, setOwners] = useState([]);
     const [totalShares, setTotalShares] = useState(0);
+    const [originalContract, setOriginalContract] = useState("");
+    const [originalTokenId, setOriginalTokenId] = useState("");
 
     useEffect(() => {
         const init = async () => {
@@ -47,6 +60,8 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
             nftMetadataFromIPFS.tokenId = tokenId;
             setMetadata(nftMetadataFromIPFS);
             setTotalShares(tokenData.totalFractionsAmount);
+            setOriginalContract(tokenData.erc721ContractAddress);
+            setOriginalTokenId(tokenData.erc721TokenId);
             const ownersFromChain = await nftFractionsRepositoryContract.methods.getOwnersBYtokenId(tokenId).call();
             let ownersData = [];
             for (let owner of ownersFromChain) {
@@ -73,7 +88,6 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
         return <div>Loading...</div>;
     }
 
-
     return (
         <Box mt={15}>
             <Grid container>
@@ -82,8 +96,7 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                 </Grid>
                 <Grid item md={1}></Grid>
                 <Grid item md={5}>
-                    <NFTDescription name={metaData.name} description={metaData.description} />
-
+                    <NFTDescription name={metaData.name} description={metaData.description} author={metaData.author} totalShares={totalShares} />
                     <div className={classes.root}>
                         <Accordion>
                             <AccordionSummary
@@ -94,7 +107,7 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                                 <Typography className={classes.heading}>Owners</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <TokenOwners owners={owners} totalShares={totalShares} />
+                                <TokenOwners owners={owners} />
                             </AccordionDetails>
                         </Accordion>
                         <Accordion>
@@ -106,17 +119,29 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                                 <Typography className={classes.heading}>Original contract</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <Typography>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                                    sit amet blandit leo lobortis eget.
-          </Typography>
+
+                                <TableContainer className={classes.table} component={Paper}>
+                                    <Table aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>Contract</TableCell>
+                                                <TableCell>TokenId</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            <TableRow key={originalContract}>
+                                                <TableCell>{originalContract}</TableCell>
+                                                <TableCell>{originalTokenId}</TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
                             </AccordionDetails>
                         </Accordion>
                     </div>
-
                 </Grid>
             </Grid>
-        </Box>
+        </Box >
     );
 }
 

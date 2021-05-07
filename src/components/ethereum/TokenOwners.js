@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function TokenOwners({ owners, totalShares }) {
+function TokenOwners({ owners }) {
     const classes = useStyles();
 
     return (
@@ -24,14 +24,14 @@ function TokenOwners({ owners, totalShares }) {
                     <TableHead>
                         <TableRow>
                             <TableCell>Owner</TableCell>
-                            <TableCell>Shares / Total</TableCell>
+                            <TableCell>Shares</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {owners.map((row) => (
                             <TableRow key={row.owner}>
                                 <TableCell>{row.owner}</TableCell>
-                                <TableCell>{row.shares} / {totalShares}</TableCell>
+                                <TableCell>{row.shares}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
