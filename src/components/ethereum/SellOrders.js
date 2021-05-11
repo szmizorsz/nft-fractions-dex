@@ -16,7 +16,7 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Grid from '@material-ui/core/Grid';
 import { TextField } from '@material-ui/core/';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     table: {
         minWidth: 450,
     },
@@ -25,9 +25,9 @@ const useStyles = makeStyles({
             borderBottom: 'unset',
         },
     },
-});
+}));
 
-function BuyOrders({ orders }) {
+function SellOrders({ orders }) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
 
@@ -40,7 +40,7 @@ function BuyOrders({ orders }) {
             return <TableBody>
                 {orders.map((row) => (
                     <>
-                        <TableRow key={row.id} className={classes.root}>
+                        <TableRow key={row.id}>
                             <TableCell>
                                 <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                                     {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -53,12 +53,14 @@ function BuyOrders({ orders }) {
                         <TableRow>
                             <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                                 <Collapse in={open} timeout="auto" unmountOnExit>
-                                    <Grid container className={classes.root}>
-                                        <Grid md={2}></Grid>
-                                        <Grid item xs={12} md={10}>
-                                            <TextField InputProps={{ disableUnderline: true }} label="Trader" value={row.trader} fullwidth margin="dense" />
+                                    <Box margin={1}>
+                                        <Grid container className={classes.root}>
+                                            <Grid md={2}></Grid>
+                                            <Grid item xs={12} md={10}>
+                                                <TextField InputProps={{ disableUnderline: true }} label="Trader" value={row.trader} margin="dense" />
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
+                                    </Box>
                                 </Collapse>
                             </TableCell>
                         </TableRow>
@@ -85,4 +87,4 @@ function BuyOrders({ orders }) {
     );
 }
 
-export default BuyOrders;
+export default SellOrders;

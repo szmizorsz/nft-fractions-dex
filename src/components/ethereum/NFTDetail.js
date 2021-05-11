@@ -21,8 +21,10 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import BuyOrders from './BuyOrders.js';
+import SellOrders from './SellOrders.js';
 import { Button } from '@material-ui/core/';
 import PlaceBuyOrder from './PlaceBuyOrder.js';
+import PlaceSellOrder from './PlaceSellOrder.js';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -49,6 +51,7 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
     const [buyOrders, setBuyOrders] = useState([]);
     const [sellOrders, setSellOrders] = useState([]);
     const [placeBuyOrderDialogOpen, setPlaceBuyOrderDialogOpen] = useState(false);
+    const [placeSellOrderDialogOpen, setPlaceSellOrderDialogOpen] = useState(false);
 
     useEffect(() => {
         const init = async () => {
@@ -170,9 +173,9 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                             <Box mb={3}>
                                 <Typography className={classes.heading}>Sell Orders</Typography>
                             </Box>
-                            <BuyOrders orders={buyOrders} />
+                            <SellOrders orders={sellOrders} />
                             <Button
-                                onClick={() => { setPlaceBuyOrderDialogOpen(true) }}
+                                onClick={() => { setPlaceSellOrderDialogOpen(true) }}
                                 variant="outlined"
                                 type="submit">
                                 Place Order
@@ -181,13 +184,18 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                     </Grid>
                 </Box>
             </Box >
-
             <PlaceBuyOrder
                 tokenId={tokenId}
                 accounts={accounts}
                 dexContract={dexContract}
                 placeBuyOrderDialogOpen={placeBuyOrderDialogOpen}
                 setPlaceBuyOrderDialogOpen={setPlaceBuyOrderDialogOpen} />
+            <PlaceSellOrder
+                tokenId={tokenId}
+                accounts={accounts}
+                dexContract={dexContract}
+                placeSellOrderDialogOpen={placeSellOrderDialogOpen}
+                setPlaceSellOrderDialogOpen={setPlaceSellOrderDialogOpen} />
         </>
     );
 }
