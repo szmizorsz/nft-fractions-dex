@@ -15,7 +15,6 @@ const DepositEthDialog = ({ accounts, dexContract, ethDepositDialogOpen, setEthD
     const [amount, setAmount] = React.useState('');
 
     const handleSubmit = async () => {
-        debugger
         const weiAmount = Web3.utils.toWei(amount.toString(), 'ether');
         let config = {
             gas: GAS_LIMIT,

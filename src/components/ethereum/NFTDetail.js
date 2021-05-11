@@ -20,6 +20,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import BuyOrders from './BuyOrders.js';
+import { Button } from '@material-ui/core/';
+import PlaceBuyOrder from './PlaceBuyOrder.js';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -43,6 +46,9 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
     const [totalShares, setTotalShares] = useState(0);
     const [originalContract, setOriginalContract] = useState("");
     const [originalTokenId, setOriginalTokenId] = useState("");
+    const [buyOrders, setBuyOrders] = useState([]);
+    const [sellOrders, setSellOrders] = useState([]);
+    const [placeBuyOrderDialogOpen, setPlaceBuyOrderDialogOpen] = useState(false);
 
     useEffect(() => {
         const init = async () => {
@@ -73,6 +79,10 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                 ownersData.push(ownerData);
             }
             setOwners(ownersData);
+            const buyOrdersFromChain = await dexContract.methods.getOrders(tokenId, 0).call();
+            setBuyOrders(buyOrdersFromChain);
+            const sellOrdersFromChain = await dexContract.methods.getOrders(tokenId, 1).call();
+            setSellOrders(sellOrdersFromChain);
         }
         init();
         // eslint-disable-next-line
@@ -89,59 +99,96 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
     }
 
     return (
-        <Box mt={15}>
-            <Grid container>
-                <Grid item md={6}>
-                    <NFTCard image={metaData.image} />
+        <>
+            <Box mt={15}>
+                <Grid container>
+                    <Grid item md={6}>
+                        <NFTCard image={metaData.image} />
+                    </Grid>
+                    <Grid item md={1}></Grid>
+                    <Grid item md={5}>
+                        <NFTDescription name={metaData.name} description={metaData.description} author={metaData.author} totalShares={totalShares} />
+                        <div className={classes.root}>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header"
+                                >
+                                    <Typography className={classes.heading}>Owners</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <TokenOwners owners={owners} />
+                                </AccordionDetails>
+                            </Accordion>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel2a-content"
+                                    id="panel2a-header"
+                                >
+                                    <Typography className={classes.heading}>Original contract</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <TableContainer className={classes.table} component={Paper}>
+                                        <Table aria-label="simple table">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>Contract</TableCell>
+                                                    <TableCell>TokenId</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                <TableRow key={originalContract}>
+                                                    <TableCell>{originalContract}</TableCell>
+                                                    <TableCell>{originalTokenId}</TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </AccordionDetails>
+                            </Accordion>
+                        </div>
+                    </Grid>
                 </Grid>
-                <Grid item md={1}></Grid>
-                <Grid item md={5}>
-                    <NFTDescription name={metaData.name} description={metaData.description} author={metaData.author} totalShares={totalShares} />
-                    <div className={classes.root}>
-                        <Accordion>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1a-content"
-                                id="panel1a-header"
-                            >
-                                <Typography className={classes.heading}>Owners</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <TokenOwners owners={owners} />
-                            </AccordionDetails>
-                        </Accordion>
-                        <Accordion>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel2a-content"
-                                id="panel2a-header"
-                            >
-                                <Typography className={classes.heading}>Original contract</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
+                <Box mt={10}>
+                    <Grid container>
+                        <Grid item md={5}>
+                            <Box mb={3}>
+                                <Typography className={classes.heading}>Buy Orders</Typography>
+                            </Box>
+                            <BuyOrders orders={buyOrders} />
+                            <Button
+                                onClick={() => { setPlaceBuyOrderDialogOpen(true) }}
+                                variant="outlined"
+                                type="submit">
+                                Place Order
+                            </Button>
+                        </Grid>
+                        <Grid item md={1}></Grid>
+                        <Grid item md={5}>
+                            <Box mb={3}>
+                                <Typography className={classes.heading}>Sell Orders</Typography>
+                            </Box>
+                            <BuyOrders orders={buyOrders} />
+                            <Button
+                                onClick={() => { setPlaceBuyOrderDialogOpen(true) }}
+                                variant="outlined"
+                                type="submit">
+                                Place Order
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Box >
 
-                                <TableContainer className={classes.table} component={Paper}>
-                                    <Table aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>Contract</TableCell>
-                                                <TableCell>TokenId</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            <TableRow key={originalContract}>
-                                                <TableCell>{originalContract}</TableCell>
-                                                <TableCell>{originalTokenId}</TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </AccordionDetails>
-                        </Accordion>
-                    </div>
-                </Grid>
-            </Grid>
-        </Box >
+            <PlaceBuyOrder
+                tokenId={tokenId}
+                accounts={accounts}
+                dexContract={dexContract}
+                placeBuyOrderDialogOpen={placeBuyOrderDialogOpen}
+                setPlaceBuyOrderDialogOpen={setPlaceBuyOrderDialogOpen} />
+        </>
     );
 }
 
