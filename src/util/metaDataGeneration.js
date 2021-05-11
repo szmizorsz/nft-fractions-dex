@@ -38,7 +38,7 @@ async function metaDataGeneration() {
         const image = "https://gateway.ipfs.io/ipfs/" + ipfsImage.path;
         const metaData = {
             "name": "Partial solar eclipse seen from Dhaka",
-            "description": "A partial solar eclipse is seen from Bangladesh in March 2016. Total eclipse followed, briefly blanketing Indonesia in total darkness.",
+            "description": "A partial solar eclipse is seen from Bangladesh in March 2016. Total eclipse followed, briefly blanketing Indonesia in darkness.",
             "author": "@sundancekid",
             "image": image
         }

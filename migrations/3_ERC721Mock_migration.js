@@ -1,7 +1,7 @@
 const ERC721Mock = artifacts.require("ERC721Mock");
 const metaDataIpfsCIDs = [
     "QmWzdJBT6w6ABZ4oxFMxJaB6cpwLaWTGthTmSVWbuEenCK",
-    "QmQS7R2czx9afHR9dYnoEHhLCx7agfPT11jt1r2U6hMteH",
+    "QmZjh3giC15jYAnCvvFVQhuBSsvPgx5KUkGg94qkbbQbV9",
     "Qmf6QNNxW5LvKmqtwQ7VmhjWnciq7LwBzDLheKWdBKvmzA",
     "QmZ54eSPBHQYCF7szFtf7Hq89jcAhzScjUaTBCWFdLvnj3",
     "QmQwSXhN3RXc4FS4oWPFPTemvwiaiQwLLnbgYuz2TwTR1a",

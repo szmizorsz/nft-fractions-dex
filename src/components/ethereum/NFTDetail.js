@@ -168,7 +168,7 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                                 Place Order
                             </Button>
                         </Grid>
-                        <Grid item md={1}></Grid>
+                        <Grid item md={2}></Grid>
                         <Grid item md={5}>
                             <Box mb={3}>
                                 <Typography className={classes.heading}>Sell Orders</Typography>

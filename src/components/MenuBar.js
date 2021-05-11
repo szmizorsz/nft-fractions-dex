@@ -5,7 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import logo from "../images/art-icon.jpg";
+import logo from "../images/arrows.png";
 
 const useStyles = makeStyles((theme) => ({
     header: {
@@ -40,15 +40,15 @@ function MenuBar() {
                         <Grid container spacing={24}>
                             <Grid item md={6}>
                                 <Box mt={1.5} mr={1}>
-                                    <Button color="inherit" variant="outlined" fullWidth target={"_blank"}>
-                                        <a href="/ethereum/landing">Open on Ethereum</a>
+                                    <Button color="inherit" fullWidth target={"_blank"} variant='outlined' >
+                                        <a href="/ethereum/landing" style={{ textDecoration: 'none', color: 'white' }}>Open on Ethereum</a>
                                     </Button>
                                 </Box>
                             </Grid>
                             <Grid item md={6}>
                                 <Box mt={1.5} ml={1}>
-                                    <Button color="inherit" variant="outlined" fullWidth >
-                                        <a href="/ethereum/landing">Open on Binance</a>
+                                    <Button color="inherit" fullWidth target={"_blank"} variant='outlined' >
+                                        <a href="/ethereum/landing" style={{ textDecoration: 'none', color: 'white' }}>Open on Binance</a>
                                     </Button>
                                 </Box>
                             </Grid>
