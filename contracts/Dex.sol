@@ -36,6 +36,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
 
     CountersUpgradeable.Counter private _orderIds;
     mapping(address => uint256) ethBalance;
+    mapping(address => uint256) ethReservedBalance;
     mapping(uint256 => mapping(uint256 => Order[])) orderBook;
     NftFractionsRepository nftFractionsRepository;
 
@@ -82,6 +83,13 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
         return ethBalance[owner];
     }
 
+    /**
+     * @dev returns the ETH reserved balance of the owner
+     */
+    function getEthReserveBalance(address owner) public view returns (uint256) {
+        return ethReservedBalance[owner];
+    }
+
     function pause() public onlyOwner() {
         _pause();
     }
@@ -114,9 +122,11 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
                 "total amount of fractions is lower than the given amount"
             );
             require(
-                ethBalance[msg.sender] >= amount * price,
+                ethBalance[msg.sender] - ethReservedBalance[msg.sender] >=
+                    amount * price,
                 "eth balance too low"
             );
+            ethReservedBalance[msg.sender] += amount * price;
         }
         Order[] storage orders = orderBook[tokenId][uint256(side)];
         _orderIds.increment();
@@ -197,7 +207,8 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
             }
             if (side == Side.BUY) {
                 require(
-                    ethBalance[msg.sender] >= orders[i].price * matched,
+                    ethBalance[msg.sender] - ethReservedBalance[msg.sender] >=
+                        orders[i].price * matched,
                     "eth balance too low"
                 );
                 nftFractionsRepository.transferFrom(

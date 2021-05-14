@@ -10,7 +10,7 @@ import Web3 from 'web3';
 
 const DepositEthDialog = ({ accounts, dexContract, ethDepositDialogOpen, setEthDepositDialogOpen }) => {
     const defaultDialogContentText = 'Please, specify the amount (ETH) to deposit.';
-    const [dialogContentText, setDialogContentText] = React.useState(defaultDialogContentText);
+    const [dialogContentText] = React.useState(defaultDialogContentText);
 
     const [amount, setAmount] = React.useState('');
 

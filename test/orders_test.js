@@ -75,6 +75,11 @@ contract("Dex orders", async function (accounts) {
         assert(orders[0].trader == buyer);
         assert(orders[0].tokenId == erc1155TokenId);
         assert(orders[0].filled == 0);
+
+        let reservedBalance = await dexInstance.getEthReserveBalance(buyer);
+        assert(reservedBalance.toNumber() == amount * price);
+        let ethBalance = await dexInstance.getEthBalance(buyer);
+        assert(ethBalance.toNumber() == ethDeposit);
     });
 
     it("should not create buy limit order for non existing token", async function () {

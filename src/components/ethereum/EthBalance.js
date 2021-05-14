@@ -8,6 +8,7 @@ import Web3 from 'web3';
 
 const EthBalance = ({ accounts, dexContract }) => {
     const [ethBalance, setEthBalance] = useState(0);
+    const [ethReservedBalance, setEthReservedBalance] = useState(0);
     const [ethDepositDialogOpen, setEthDepositDialogOpen] = useState(false);
     const [ethWithdrawDialogOpen, setEthWithdrawDialogOpen] = useState(false);
 
@@ -16,6 +17,9 @@ const EthBalance = ({ accounts, dexContract }) => {
             let ethBalanceFromChain = await dexContract.methods.getEthBalance(accounts[0]).call();
             ethBalanceFromChain = Web3.utils.fromWei(ethBalanceFromChain, 'ether');
             setEthBalance(ethBalanceFromChain);
+            let ethReservedBalanceFromChain = await dexContract.methods.getEthReserveBalance(accounts[0]).call();
+            ethReservedBalanceFromChain = Web3.utils.fromWei(ethReservedBalanceFromChain, 'ether');
+            setEthReservedBalance(ethReservedBalanceFromChain);
         }
         loadEthBalance();
         // eslint-disable-next-line
@@ -23,9 +27,14 @@ const EthBalance = ({ accounts, dexContract }) => {
 
     return (
         <>
-            <Box mt={5} mb={5}>
+            <Box mt={5} mb={3}>
                 <Typography>
                     Your ETH Balance: {ethBalance}
+                </Typography>
+            </Box>
+            <Box mb={5}>
+                <Typography>
+                    ETH reserved in orders: {ethReservedBalance}
                 </Typography>
             </Box>
             <Button

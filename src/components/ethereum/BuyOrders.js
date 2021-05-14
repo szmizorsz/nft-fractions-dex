@@ -27,9 +27,40 @@ const useStyles = makeStyles({
     },
 });
 
-function BuyOrders({ orders }) {
+const Row = ({ row }) => {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
+
+    return (
+        <>
+            <TableRow key={row.id} className={classes.root}>
+                <TableCell>
+                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                </TableCell>
+                <TableCell>{row.ethPrice}</TableCell>
+                <TableCell>{row.amount}</TableCell>
+                <TableCell>{row.filled}</TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Grid container className={classes.root}>
+                            <Grid md={2}></Grid>
+                            <Grid item xs={12} md={10}>
+                                <TextField InputProps={{ disableUnderline: true }} label="Trader" value={row.trader} fullwidth margin="dense" />
+                            </Grid>
+                        </Grid>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+        </>
+    )
+}
+
+function BuyOrders({ orders }) {
+    const classes = useStyles();
 
     const rowsDisplay = () => {
         if (orders.length === 0) {
@@ -39,30 +70,7 @@ function BuyOrders({ orders }) {
         } else {
             return <TableBody>
                 {orders.map((row) => (
-                    <>
-                        <TableRow key={row.id} className={classes.root}>
-                            <TableCell>
-                                <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                                    {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                                </IconButton>
-                            </TableCell>
-                            <TableCell>{row.price}</TableCell>
-                            <TableCell>{row.amount}</TableCell>
-                            <TableCell>{row.filled}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                                <Collapse in={open} timeout="auto" unmountOnExit>
-                                    <Grid container className={classes.root}>
-                                        <Grid md={2}></Grid>
-                                        <Grid item xs={12} md={10}>
-                                            <TextField InputProps={{ disableUnderline: true }} label="Trader" value={row.trader} fullwidth margin="dense" />
-                                        </Grid>
-                                    </Grid>
-                                </Collapse>
-                            </TableCell>
-                        </TableRow>
-                    </>
+                    <Row row={row} />
                 ))}
             </TableBody>
         }

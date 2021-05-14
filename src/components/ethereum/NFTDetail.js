@@ -52,6 +52,10 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
     const [sellOrders, setSellOrders] = useState([]);
     const [placeBuyOrderDialogOpen, setPlaceBuyOrderDialogOpen] = useState(false);
     const [placeSellOrderDialogOpen, setPlaceSellOrderDialogOpen] = useState(false);
+    const [ethBalance, setEthBalance] = useState(0);
+    const [ethReservedBalance, setEthReservedBalance] = useState(0);
+    const [sellOrderAvailable, setSellOrderAvailable] = useState(false);
+    const [buyOrderAvailable, setBuyOrderAvailable] = useState(false);
 
     useEffect(() => {
         const init = async () => {
@@ -83,9 +87,25 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
             }
             setOwners(ownersData);
             const buyOrdersFromChain = await dexContract.methods.getOrders(tokenId, 0).call();
-            setBuyOrders(buyOrdersFromChain);
+            const buyOrdersExtended = buyOrdersFromChain.map((item) => ({
+                ...item,
+                ethPrice: web3.utils.fromWei(item.price, 'ether')
+            }));
+            setBuyOrders(buyOrdersExtended);
             const sellOrdersFromChain = await dexContract.methods.getOrders(tokenId, 1).call();
-            setSellOrders(sellOrdersFromChain);
+            const sellOrdersExtended = sellOrdersFromChain.map((item) => ({
+                ...item,
+                ethPrice: web3.utils.fromWei(item.price, 'ether')
+            }));
+            setBuyOrderAvailable(buyOrders.length > 0);
+            setSellOrders(sellOrdersExtended);
+            let ethBalanceFromChain = await dexContract.methods.getEthBalance(accounts[0]).call();
+            ethBalanceFromChain = web3.utils.fromWei(ethBalanceFromChain, 'ether');
+            setSellOrderAvailable(sellOrders.length > 0);
+            setEthBalance(ethBalanceFromChain);
+            let ethReservedBalanceFromChain = await dexContract.methods.getEthReserveBalance(accounts[0]).call();
+            ethReservedBalanceFromChain = web3.utils.fromWei(ethReservedBalanceFromChain, 'ether');
+            setEthReservedBalance(ethReservedBalanceFromChain);
         }
         init();
         // eslint-disable-next-line
@@ -185,11 +205,15 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                 </Box>
             </Box >
             <PlaceBuyOrder
+                web3={web3}
+                ethBalance={ethBalance}
+                ethReservedBalance={ethReservedBalance}
                 tokenId={tokenId}
                 accounts={accounts}
                 dexContract={dexContract}
                 placeBuyOrderDialogOpen={placeBuyOrderDialogOpen}
-                setPlaceBuyOrderDialogOpen={setPlaceBuyOrderDialogOpen} />
+                setPlaceBuyOrderDialogOpen={setPlaceBuyOrderDialogOpen}
+                sellOrderAvailable={sellOrderAvailable} />
             <PlaceSellOrder
                 tokenId={tokenId}
                 accounts={accounts}
