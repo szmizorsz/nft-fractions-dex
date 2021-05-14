@@ -180,7 +180,7 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                             <Box mb={3}>
                                 <Typography className={classes.heading}>Buy Orders</Typography>
                             </Box>
-                            <BuyOrders orders={buyOrders} />
+                            <BuyOrders orders={buyOrders} accounts={accounts} dexContract={dexContract} />
                             <Button
                                 onClick={() => { setPlaceBuyOrderDialogOpen(true) }}
                                 variant="outlined"

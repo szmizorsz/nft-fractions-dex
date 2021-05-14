@@ -362,5 +362,42 @@ contract("Dex orders", async function (accounts) {
         let buyerBalance = await nftFractionsRepositoryInstance.balanceOf(buyer, erc1155TokenId);
         assert(buyerBalance.toNumber() === 100);
     });
+
+    it("should delete limit order", async function () {
+        let amount = 50;
+        let price = 2;
+        let sellSide = 1;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount, price, sellSide, { from: nftOwner });
+        let amount2 = 60;
+        let price2 = 3;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount2, price2, sellSide, { from: nftOwner });
+
+        let orderIdToDelete = 1;
+        await dexInstance.deleteOrder(erc1155TokenId, sellSide, orderIdToDelete, { from: nftOwner });
+
+        let orders = await dexInstance.getOrders(erc1155TokenId, sellSide);
+        assert(orders.length == 1);
+        assert(orders[0].id == 2);
+        assert(orders[0].amount == amount2);
+        assert(orders[0].price == price2);
+        assert(orders[0].side == sellSide);
+        assert(orders[0].trader == nftOwner);
+        assert(orders[0].tokenId == erc1155TokenId);
+    });
+
+    it("should not delete limit order if the sender is not the trader who registered the order", async function () {
+        let amount = 50;
+        let price = 2;
+        let sellSide = 1;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount, price, sellSide, { from: nftOwner });
+        let amount2 = 60;
+        let price2 = 3;
+        await dexInstance.createLimitOrder(erc1155TokenId, amount2, price2, sellSide, { from: nftOwner });
+
+        let orderIdToDelete = 1;
+        await truffleAssert.reverts(
+            dexInstance.deleteOrder(erc1155TokenId, sellSide, orderIdToDelete, { from: accounts[2] }),
+            "Only the trader can delete his order");
+    });
 });
 

@@ -71,7 +71,10 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
      */
     function withdrawEth(uint256 amount) public {
         require(!paused(), "Not allowed while paused");
-        require(ethBalance[msg.sender] >= amount, "ETH balance is not enough");
+        require(
+            ethBalance[msg.sender] - ethReservedBalance[msg.sender] >= amount,
+            "ETH balance is not enough"
+        );
         ethBalance[msg.sender] -= amount;
         payable(msg.sender).transfer(amount);
     }
@@ -234,12 +237,36 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
         }
     }
 
+    /**
+     * @dev returns the orders of the token and side
+     */
     function getOrders(uint256 tokenId, Side side)
         external
         view
         returns (Order[] memory)
     {
         return orderBook[tokenId][uint256(side)];
+    }
+
+    /**
+     * @dev delete the order
+     */
+    function deleteOrder(
+        uint256 tokenId,
+        Side side,
+        uint256 orderId
+    ) public {
+        Order[] storage orders = orderBook[tokenId][uint256(side)];
+        for (uint256 i = 0; i < orders.length; i++) {
+            if (orders[i].id == orderId) {
+                require(
+                    msg.sender == orders[i].trader,
+                    "Only the trader can delete his order"
+                );
+                orders[i] = orders[orders.length - 1];
+                orders.pop();
+            }
+        }
     }
 
     modifier tokenExist(uint256 tokenId) {
