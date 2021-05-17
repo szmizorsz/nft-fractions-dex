@@ -14,6 +14,7 @@ import Box from '@material-ui/core/Box';
 
 const PlaceBuyOrder = ({
     web3,
+    nftFractionsRepositoryContract,
     ethBalance,
     ethReservedBalance,
     tokenId,
@@ -50,8 +51,6 @@ const PlaceBuyOrder = ({
             setDialogContentText('There is no sell order to match against');
             return;
         }
-        const weiPrice = web3.utils.toWei(price.toString(), 'ether');
-        debugger
         let config = {
             gas: GAS_LIMIT,
             from: accounts[0]
@@ -59,6 +58,7 @@ const PlaceBuyOrder = ({
         if (marketPerLimit === 'market') {
             await dexContract.methods.createMarketOrder(tokenId, amount, 0).send(config);
         } else {
+            const weiPrice = web3.utils.toWei(price.toString(), 'ether');
             await dexContract.methods.createLimitOrder(tokenId, amount, weiPrice, 0).send(config);
         }
 

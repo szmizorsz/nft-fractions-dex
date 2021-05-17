@@ -25,6 +25,7 @@ import SellOrders from './SellOrders.js';
 import { Button } from '@material-ui/core/';
 import PlaceBuyOrder from './PlaceBuyOrder.js';
 import PlaceSellOrder from './PlaceSellOrder.js';
+import TokenTransferApprovalDialog from './TokenTransferApprovalDialog.js';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -56,6 +57,8 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
     const [ethReservedBalance, setEthReservedBalance] = useState(0);
     const [sellOrderAvailable, setSellOrderAvailable] = useState(false);
     const [buyOrderAvailable, setBuyOrderAvailable] = useState(false);
+    const [sharesAvailableForSelling, setSharesAvailableForSelling] = useState(0);
+    const [tokenTransferDialogOpen, setTokenTransferDialogOpen] = useState(false);
 
     useEffect(() => {
         const init = async () => {
@@ -77,14 +80,20 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
             setOriginalTokenId(tokenData.erc721TokenId);
             const ownersFromChain = await nftFractionsRepositoryContract.methods.getOwnersBYtokenId(tokenId).call();
             let ownersData = [];
+            let acctualAccountsShares;
             for (let owner of ownersFromChain) {
-                const ownerShares = await nftFractionsRepositoryContract.methods.balanceOf(owner, tokenId).call()
+                const ownerShares = await nftFractionsRepositoryContract.methods.balanceOf(owner, tokenId).call();
                 let ownerData = {
                     "owner": owner,
                     "shares": ownerShares
                 }
                 ownersData.push(ownerData);
+                if (owner === accounts[0]) {
+                    acctualAccountsShares = ownerShares;
+                }
             }
+            let sharesReservedInOrders = await dexContract.methods.getSharesReserveBalance(accounts[0], tokenId).call();
+            setSharesAvailableForSelling(acctualAccountsShares - sharesReservedInOrders);
             setOwners(ownersData);
             const buyOrdersFromChain = await dexContract.methods.getOrders(tokenId, 0).call();
             const buyOrdersExtended = buyOrdersFromChain.map((item) => ({
@@ -97,11 +106,11 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                 ...item,
                 ethPrice: web3.utils.fromWei(item.price, 'ether')
             }));
-            setBuyOrderAvailable(buyOrders.length > 0);
+            setBuyOrderAvailable(buyOrdersExtended.length > 0);
             setSellOrders(sellOrdersExtended);
             let ethBalanceFromChain = await dexContract.methods.getEthBalance(accounts[0]).call();
             ethBalanceFromChain = web3.utils.fromWei(ethBalanceFromChain, 'ether');
-            setSellOrderAvailable(sellOrders.length > 0);
+            setSellOrderAvailable(sellOrdersExtended.length > 0);
             setEthBalance(ethBalanceFromChain);
             let ethReservedBalanceFromChain = await dexContract.methods.getEthReserveBalance(accounts[0]).call();
             ethReservedBalanceFromChain = web3.utils.fromWei(ethReservedBalanceFromChain, 'ether');
@@ -193,7 +202,7 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                             <Box mb={3}>
                                 <Typography className={classes.heading}>Sell Orders</Typography>
                             </Box>
-                            <SellOrders orders={sellOrders} />
+                            <SellOrders orders={sellOrders} accounts={accounts} dexContract={dexContract} />
                             <Button
                                 onClick={() => { setPlaceSellOrderDialogOpen(true) }}
                                 variant="outlined"
@@ -215,11 +224,21 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                 setPlaceBuyOrderDialogOpen={setPlaceBuyOrderDialogOpen}
                 sellOrderAvailable={sellOrderAvailable} />
             <PlaceSellOrder
+                web3={web3}
                 tokenId={tokenId}
                 accounts={accounts}
                 dexContract={dexContract}
                 placeSellOrderDialogOpen={placeSellOrderDialogOpen}
-                setPlaceSellOrderDialogOpen={setPlaceSellOrderDialogOpen} />
+                setPlaceSellOrderDialogOpen={setPlaceSellOrderDialogOpen}
+                buyOrderAvailable={buyOrderAvailable}
+                sharesAvailableForSelling={sharesAvailableForSelling}
+                setTokenTransferDialogOpen={setTokenTransferDialogOpen} />
+            <TokenTransferApprovalDialog
+                open={tokenTransferDialogOpen}
+                nftFractionsRepositoryContract={nftFractionsRepositoryContract}
+                accounts={accounts}
+                setTokenTransferDialogOpen={setTokenTransferDialogOpen}
+                dexContractAddress={dexContract._address} />
         </>
     );
 }

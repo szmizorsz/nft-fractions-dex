@@ -37,6 +37,9 @@ contract("Dex orders", async function (accounts) {
         assert(orders[0].trader == nftOwner);
         assert(orders[0].tokenId == erc1155TokenId);
         assert(orders[0].filled == 0);
+
+        let sharesReserved = await dexInstance.getSharesReserveBalance(nftOwner, erc1155TokenId, { from: nftOwner });
+        assert(sharesReserved.toNumber() === amount);
     });
 
     it("should not create sell limit order with more amount than the sender's balance", async function () {

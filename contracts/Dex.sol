@@ -38,6 +38,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
     mapping(address => uint256) ethBalance;
     mapping(address => uint256) ethReservedBalance;
     mapping(uint256 => mapping(uint256 => Order[])) orderBook;
+    mapping(address => mapping(uint256 => uint256)) sharesReserved;
     NftFractionsRepository nftFractionsRepository;
 
     function initialize() public initializer {
@@ -93,6 +94,17 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
         return ethReservedBalance[owner];
     }
 
+    /**
+     * @dev returns the shares reserved in orders for a given owner and tokenId
+     */
+    function getSharesReserveBalance(address owner, uint256 tokenId)
+        public
+        view
+        returns (uint256)
+    {
+        return sharesReserved[owner][tokenId];
+    }
+
     function pause() public onlyOwner() {
         _pause();
     }
@@ -111,6 +123,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
                 sendersBalance >= amount,
                 "message sender's token balance is too low"
             );
+            sharesReserved[msg.sender][tokenId] += amount;
         } else {
             address erc721ContractAddress;
             uint256 erc721TokenId;
