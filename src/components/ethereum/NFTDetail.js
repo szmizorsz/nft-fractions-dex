@@ -47,6 +47,7 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
     const [metaData, setMetadata] = useState(undefined);
     const [owners, setOwners] = useState([]);
     const [totalShares, setTotalShares] = useState(0);
+    const [myShares, setMyShares] = useState(0);
     const [originalContract, setOriginalContract] = useState("");
     const [originalTokenId, setOriginalTokenId] = useState("");
     const [buyOrders, setBuyOrders] = useState([]);
@@ -76,6 +77,8 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
             nftMetadataFromIPFS.tokenId = tokenId;
             setMetadata(nftMetadataFromIPFS);
             setTotalShares(tokenData.totalFractionsAmount);
+            const mySharesFromChain = await nftFractionsRepositoryContract.methods.balanceOf(accounts[0], tokenId).call();
+            setMyShares(mySharesFromChain);
             setOriginalContract(tokenData.erc721ContractAddress);
             setOriginalTokenId(tokenData.erc721TokenId);
             const ownersFromChain = await nftFractionsRepositoryContract.methods.getOwnersBYtokenId(tokenId).call();
@@ -139,7 +142,15 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
                     </Grid>
                     <Grid item md={1}></Grid>
                     <Grid item md={5}>
-                        <NFTDescription name={metaData.name} description={metaData.description} author={metaData.author} totalShares={totalShares} />
+                        <NFTDescription
+                            accounts={accounts}
+                            nftFractionsRepositoryContract={nftFractionsRepositoryContract}
+                            tokenId={tokenId}
+                            name={metaData.name}
+                            description={metaData.description}
+                            author={metaData.author}
+                            ownShares={myShares}
+                            totalShares={totalShares} />
                         <div className={classes.root}>
                             <Accordion>
                                 <AccordionSummary

@@ -36,7 +36,7 @@ const AllNFTs = ({ web3, accounts, nftFractionsRepositoryContract, ipfs }) => {
 
     return (
         <>
-            <NFTCards nftList={nftList} nftFractionsRepositoryContract={nftFractionsRepositoryContract} accounts={accounts} />
+            <NFTCards nftList={nftList} />
         </>
     )
 

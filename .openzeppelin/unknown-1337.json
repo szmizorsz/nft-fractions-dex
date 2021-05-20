@@ -5166,13 +5166,13 @@
           {
             "contract": "NftFractionsRepository",
             "label": "_ids",
-            "type": "t_struct(Counter)3361_storage",
+            "type": "t_struct(Counter)3395_storage",
             "src": "NftFractionsRepository.sol:26"
           },
           {
             "contract": "NftFractionsRepository",
             "label": "tokens",
-            "type": "t_mapping(t_uint256,t_struct(Token)970_storage)",
+            "type": "t_mapping(t_uint256,t_struct(Token)1004_storage)",
             "src": "NftFractionsRepository.sol:27"
           },
           {
@@ -5195,7 +5195,7 @@
           }
         ],
         "types": {
-          "t_struct(Counter)3361_storage": {
+          "t_struct(Counter)3395_storage": {
             "label": "struct CountersUpgradeable.Counter",
             "members": [
               {
@@ -5207,10 +5207,10 @@
           "t_uint256": {
             "label": "uint256"
           },
-          "t_mapping(t_uint256,t_struct(Token)970_storage)": {
+          "t_mapping(t_uint256,t_struct(Token)1004_storage)": {
             "label": "mapping(uint256 => struct NftFractionsRepository.Token)"
           },
-          "t_struct(Token)970_storage": {
+          "t_struct(Token)1004_storage": {
             "label": "struct NftFractionsRepository.Token",
             "members": [
               {
@@ -5437,174 +5437,9 @@
         }
       }
     },
-    "24b4d62a4a40bebbd9039eb1657a0a17f5c2930ec48dcbad592ac9c253087b63": {
-      "address": "0x4Fa1f61d62ae4aB602F3f1b272d0D8FDBF5492bf",
-      "txHash": "0x65ebd67330c3058575ca7b321d659eba409a62208fbefa3c50314565e51e394e",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:30"
-          },
-          {
-            "contract": "ContextUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
-          },
-          {
-            "contract": "PausableUpgradeable",
-            "label": "_paused",
-            "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:28"
-          },
-          {
-            "contract": "PausableUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:96"
-          },
-          {
-            "contract": "OwnableUpgradeable",
-            "label": "_owner",
-            "type": "t_address",
-            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
-          },
-          {
-            "contract": "OwnableUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
-          },
-          {
-            "contract": "Dex",
-            "label": "_orderIds",
-            "type": "t_struct(Counter)3361_storage",
-            "src": "Dex.sol:37"
-          },
-          {
-            "contract": "Dex",
-            "label": "ethBalance",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "Dex.sol:38"
-          },
-          {
-            "contract": "Dex",
-            "label": "ethReservedBalance",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "Dex.sol:39"
-          },
-          {
-            "contract": "Dex",
-            "label": "orderBook",
-            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_array(t_struct(Order)37_storage)dyn_storage))",
-            "src": "Dex.sol:40"
-          },
-          {
-            "contract": "Dex",
-            "label": "nftFractionsRepository",
-            "type": "t_contract(NftFractionsRepository)1537",
-            "src": "Dex.sol:41"
-          }
-        ],
-        "types": {
-          "t_struct(Counter)3361_storage": {
-            "label": "struct CountersUpgradeable.Counter",
-            "members": [
-              {
-                "label": "_value",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)"
-          },
-          "t_address": {
-            "label": "address"
-          },
-          "t_mapping(t_uint256,t_mapping(t_uint256,t_array(t_struct(Order)37_storage)dyn_storage))": {
-            "label": "mapping(uint256 => mapping(uint256 => struct Dex.Order[]))"
-          },
-          "t_mapping(t_uint256,t_array(t_struct(Order)37_storage)dyn_storage)": {
-            "label": "mapping(uint256 => struct Dex.Order[])"
-          },
-          "t_array(t_struct(Order)37_storage)dyn_storage": {
-            "label": "struct Dex.Order[]"
-          },
-          "t_struct(Order)37_storage": {
-            "label": "struct Dex.Order",
-            "members": [
-              {
-                "label": "id",
-                "type": "t_uint256"
-              },
-              {
-                "label": "trader",
-                "type": "t_address"
-              },
-              {
-                "label": "side",
-                "type": "t_enum(Side)19"
-              },
-              {
-                "label": "tokenId",
-                "type": "t_uint256"
-              },
-              {
-                "label": "amount",
-                "type": "t_uint256"
-              },
-              {
-                "label": "filled",
-                "type": "t_uint256"
-              },
-              {
-                "label": "price",
-                "type": "t_uint256"
-              },
-              {
-                "label": "date",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_enum(Side)19": {
-            "label": "enum Dex.Side",
-            "members": [
-              "BUY",
-              "SELL"
-            ]
-          },
-          "t_contract(NftFractionsRepository)1537": {
-            "label": "contract NftFractionsRepository"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
-          },
-          "t_bool": {
-            "label": "bool"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]"
-          }
-        }
-      }
-    },
     "89a814a500d9fca343fa909b376ea102aa709568d09d2687c28deaff497cbc90": {
-      "address": "0xe529Cb4d5A85B797e4429Fb8bbc217ecF5dA5d0D",
-      "txHash": "0x4d280910a57a875c791802bf960e4de3a975567f4548f7b365e6af585b5686b6",
+      "address": "0x4Fa1f61d62ae4aB602F3f1b272d0D8FDBF5492bf",
+      "txHash": "0x1f9aadc41e69cd898e0c8d213617ad83586acc24d0c5e5037aa778e2ccd56bd9",
       "layout": {
         "storage": [
           {
