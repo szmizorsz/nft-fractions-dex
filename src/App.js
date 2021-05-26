@@ -2,7 +2,8 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import MenuBar from './components/MenuBar.js'
 import Box from '@material-ui/core/Box';
-import LoadingContainer from './components/ethereum/LoadingContainer.js';
+import LoadingMaticContainer from './components/matic/LoadingMaticContainer.js';
+import LoadingBscContainer from './components/bsc/LoadingBscContainer.js';
 import MyRoute from './components/MyRoute.js';
 
 function App() {
@@ -14,8 +15,11 @@ function App() {
         <Grid item xs={12} md={8}>
           <Box mt={10}>
             <div className="content">
-              <MyRoute path="/ethereum/landing">
-                <LoadingContainer />
+              <MyRoute path="/matic/landing">
+                <LoadingMaticContainer />
+              </MyRoute>
+              <MyRoute path="/bsc/landing">
+                <LoadingBscContainer />
               </MyRoute>
             </div>
           </Box>

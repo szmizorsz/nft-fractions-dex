@@ -41,14 +41,14 @@ function MenuBar() {
                             <Grid item md={6}>
                                 <Box mt={1.5} mr={1}>
                                     <Button color="inherit" fullWidth target={"_blank"} variant='outlined' >
-                                        <a href="/ethereum/landing" style={{ textDecoration: 'none', color: 'white' }}>Open on Ethereum</a>
+                                        <a href="/matic/landing" style={{ textDecoration: 'none', color: 'white' }}>Open on Matic</a>
                                     </Button>
                                 </Box>
                             </Grid>
                             <Grid item md={6}>
                                 <Box mt={1.5} ml={1}>
                                     <Button color="inherit" fullWidth target={"_blank"} variant='outlined' >
-                                        <a href="/ethereum/landing" style={{ textDecoration: 'none', color: 'white' }}>Open on Binance</a>
+                                        <a href="/bsc/landing" style={{ textDecoration: 'none', color: 'white' }}>Open on Binance</a>
                                     </Button>
                                 </Box>
                             </Grid>
