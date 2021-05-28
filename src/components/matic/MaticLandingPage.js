@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import Box from '@material-ui/core/Box'
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -10,6 +10,8 @@ import { Button } from '@material-ui/core/'
 import DepositNft from './DepositNft.js'
 import Grid from '@material-ui/core/Grid';
 import MaticBalance from './MaticBalance.js'
+import NftFractionsRepository from '../../contracts/matic/NftFractionsRepository.json';
+import Dex from '../../contracts/matic/Dex.json';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -82,14 +84,56 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const LandingPage = ({ web3, accounts, nftFractionsRepositoryContract, dexContract, ipfs }) => {
+const MaticLandingPage = ({ web3, accounts, ipfs }) => {
     const [nftDepositDialogOpen, setNftDepositDialogOpen] = useState(false);
+    const [nftFractionsRepositoryContract, setNftFractionsRepositoryContract] = useState(undefined);
+    const [dexContract, setDexContract] = useState(undefined);
+    const [selectedNetwork, setSelectedNetwork] = useState(0);
 
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    useEffect(() => {
+        const init = async () => {
+            const networkId = await web3.eth.net.getId();
+            setSelectedNetwork(networkId);
+            let deployedNetwork = NftFractionsRepository.networks[networkId];
+            const nftFractionsRepositoryContract = new web3.eth.Contract(
+                NftFractionsRepository.abi,
+                deployedNetwork && deployedNetwork.address,
+            );
+            deployedNetwork = Dex.networks[networkId];
+            const dexContract = new web3.eth.Contract(
+                Dex.abi,
+                deployedNetwork && deployedNetwork.address,
+            );
+            setNftFractionsRepositoryContract(nftFractionsRepositoryContract);
+            setDexContract(dexContract);
+        }
+        init();
+        window.ethereum.on('chainChanged', chainId => {
+            setSelectedNetwork(chainId);
+            window.location.reload()
+        });
+        // eslint-disable-next-line
+    }, []);
+
+    const isReady = () => {
+        return (
+            typeof nftFractionsRepositoryContract !== 'undefined'
+            && typeof dexContract !== 'undefined'
+            && typeof web3 !== 'undefined'
+            && typeof accounts !== 'undefined'
+            && selectedNetwork === 80001
+        );
+    }
+
+    if (!isReady()) {
+        return <div>Loading... Please, make sure the Matic Mumbai testnet is selected in Metamask!</div>;
+    }
 
     return (
         <>
@@ -147,4 +191,4 @@ const LandingPage = ({ web3, accounts, nftFractionsRepositoryContract, dexContra
     )
 }
 
-export default LandingPage;
+export default MaticLandingPage;

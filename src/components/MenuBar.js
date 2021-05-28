@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import logo from "../images/arrows.png";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     header: {
@@ -40,16 +41,12 @@ function MenuBar() {
                         <Grid container spacing={24}>
                             <Grid item md={6}>
                                 <Box mt={1.5} mr={1}>
-                                    <Button color="inherit" fullWidth target={"_blank"} variant='outlined' >
-                                        <a href="/matic/landing" style={{ textDecoration: 'none', color: 'white' }}>Open on Matic</a>
-                                    </Button>
+                                    <Button color="inherit" fullWidth variant='outlined' component={Link} to="/matic/landing">Open on Matic</Button>
                                 </Box>
                             </Grid>
                             <Grid item md={6}>
                                 <Box mt={1.5} ml={1}>
-                                    <Button color="inherit" fullWidth target={"_blank"} variant='outlined' >
-                                        <a href="/bsc/landing" style={{ textDecoration: 'none', color: 'white' }}>Open on Binance</a>
-                                    </Button>
+                                    <Button color="inherit" fullWidth variant='outlined' component={Link} to="/bsc/landing">Open on Binance</Button>
                                 </Box>
                             </Grid>
                         </Grid>

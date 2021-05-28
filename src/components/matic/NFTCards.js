@@ -9,11 +9,6 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Box from '@material-ui/core/Box';
 import CardActions from '@material-ui/core/CardActions';
 import { Link } from "react-router-dom";
-import {
-    Switch,
-    Route
-} from "react-router-dom";
-import NFTDetail from "./NFTDetail.js";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -68,12 +63,6 @@ const NFTCards = ({ nftList }) => {
                     </Box>
                 </Grid>
             ))}
-            <Switch>
-                <Route path="/ethereum/nft/:tokenId" exact>
-                    <NFTDetail />
-                </Route>
-
-            </Switch>
         </Grid>
     );
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { withRouter } from "react-router";
 import NFTCard from './NFTCard.js'
 import { BufferList } from "bl";
-import ERC721 from '../../contracts/matic/ERC721.json';
+import ERC721 from '../../contracts/bsc/ERC721.json';
 import TokenOwners from './TokenOwners.js';
 import Grid from '@material-ui/core/Grid';
 import NFTDescription from './NFTDescription.js'
@@ -26,6 +26,8 @@ import { Button } from '@material-ui/core/';
 import PlaceBuyOrder from './PlaceBuyOrder.js';
 import PlaceSellOrder from './PlaceSellOrder.js';
 import TokenTransferApprovalDialog from './TokenTransferApprovalDialog.js';
+import NftFractionsRepository from '../../contracts/bsc/NftFractionsRepository.json';
+import Dex from '../../contracts/bsc/Dex.json';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -40,10 +42,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexContract, ipfs }) => {
+const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
     const { params: { tokenId } } = match;
     const classes = useStyles();
 
+    const [nftFractionsRepositoryContract, setNftFractionsRepositoryContract] = useState(undefined);
+    const [dexContract, setDexContract] = useState(undefined);
     const [metaData, setMetadata] = useState(undefined);
     const [owners, setOwners] = useState([]);
     const [totalShares, setTotalShares] = useState(0);
@@ -54,15 +58,31 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
     const [sellOrders, setSellOrders] = useState([]);
     const [placeBuyOrderDialogOpen, setPlaceBuyOrderDialogOpen] = useState(false);
     const [placeSellOrderDialogOpen, setPlaceSellOrderDialogOpen] = useState(false);
-    const [maticBalance, setEthBalance] = useState(0);
-    const [maticReservedBalance, setEthReservedBalance] = useState(0);
+    const [bnbBalance, setBnbBalance] = useState(0);
+    const [bnbReservedBalance, setBnbReservedBalance] = useState(0);
     const [sellOrderAvailable, setSellOrderAvailable] = useState(false);
     const [buyOrderAvailable, setBuyOrderAvailable] = useState(false);
     const [sharesAvailableForSelling, setSharesAvailableForSelling] = useState(0);
     const [tokenTransferDialogOpen, setTokenTransferDialogOpen] = useState(false);
+    const [selectedNetwork, setSelectedNetwork] = useState(0);
 
     useEffect(() => {
         const init = async () => {
+            const networkId = await web3.eth.net.getId();
+            setSelectedNetwork(networkId);
+            let deployedNetwork = NftFractionsRepository.networks[networkId];
+            const nftFractionsRepositoryContract = new web3.eth.Contract(
+                NftFractionsRepository.abi,
+                deployedNetwork && deployedNetwork.address,
+            );
+            deployedNetwork = Dex.networks[networkId];
+            const dexContract = new web3.eth.Contract(
+                Dex.abi,
+                deployedNetwork && deployedNetwork.address,
+            );
+            setNftFractionsRepositoryContract(nftFractionsRepositoryContract);
+            setDexContract(dexContract);
+
             const tokenData = await nftFractionsRepositoryContract.methods.getTokenData(tokenId).call();
             const erc721 = new web3.eth.Contract(ERC721.abi, tokenData.erc721ContractAddress);
             const tokenURI = await erc721.methods.tokenURI(tokenData.erc721TokenId).call();
@@ -111,13 +131,13 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
             }));
             setBuyOrderAvailable(buyOrdersExtended.length > 0);
             setSellOrders(sellOrdersExtended);
-            let maticBalanceFromChain = await dexContract.methods.getEthBalance(accounts[0]).call();
-            maticBalanceFromChain = web3.utils.fromWei(maticBalanceFromChain, 'ether');
+            let bnbBalanceFromChain = await dexContract.methods.getEthBalance(accounts[0]).call();
+            bnbBalanceFromChain = web3.utils.fromWei(bnbBalanceFromChain, 'ether');
             setSellOrderAvailable(sellOrdersExtended.length > 0);
-            setEthBalance(maticBalanceFromChain);
-            let maticReservedBalanceFromChain = await dexContract.methods.getEthReserveBalance(accounts[0]).call();
-            maticReservedBalanceFromChain = web3.utils.fromWei(maticReservedBalanceFromChain, 'ether');
-            setEthReservedBalance(maticReservedBalanceFromChain);
+            setBnbBalance(bnbBalanceFromChain);
+            let bnbReservedBalanceFromChain = await dexContract.methods.getEthReserveBalance(accounts[0]).call();
+            bnbReservedBalanceFromChain = web3.utils.fromWei(bnbReservedBalanceFromChain, 'ether');
+            setBnbReservedBalance(bnbReservedBalanceFromChain);
         }
         init();
         // eslint-disable-next-line
@@ -125,7 +145,12 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
 
     const isReady = () => {
         return (
-            typeof metaData !== 'undefined'
+            typeof nftFractionsRepositoryContract !== 'undefined'
+            && typeof metaData !== 'undefined'
+            && typeof dexContract !== 'undefined'
+            && typeof web3 !== 'undefined'
+            && typeof accounts !== 'undefined'
+            && selectedNetwork === 97
         );
     }
 
@@ -226,8 +251,8 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
             </Box >
             <PlaceBuyOrder
                 web3={web3}
-                maticBalance={maticBalance}
-                maticReservedBalance={maticReservedBalance}
+                bnbBalance={bnbBalance}
+                bnbReservedBalance={bnbReservedBalance}
                 tokenId={tokenId}
                 accounts={accounts}
                 dexContract={dexContract}
@@ -254,4 +279,4 @@ const NFTDetail = ({ match, web3, accounts, nftFractionsRepositoryContract, dexC
     );
 }
 
-export default withRouter(NFTDetail);
+export default withRouter(BscNFTDetail);
