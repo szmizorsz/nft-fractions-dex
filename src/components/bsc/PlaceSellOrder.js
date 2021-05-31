@@ -46,7 +46,6 @@ const PlaceSellOrder = ({
             setDialogContentText('There is no sell order to match against');
             return;
         }
-        const weiPrice = web3.utils.toWei(price.toString(), 'ether');
         let config = {
             gas: GAS_LIMIT,
             from: accounts[0]
@@ -54,6 +53,7 @@ const PlaceSellOrder = ({
         if (marketPerLimit === 'market') {
             await dexContract.methods.createMarketOrder(tokenId, amount, 1).send(config);
         } else {
+            const weiPrice = web3.utils.toWei(price.toString(), 'ether');
             await dexContract.methods.createLimitOrder(tokenId, amount, weiPrice, 1).send(config);
             setTokenTransferDialogOpen(true);
         }
@@ -89,7 +89,7 @@ const PlaceSellOrder = ({
 
     return (
         <Dialog open={placeSellOrderDialogOpen} onClose={handleClose} aria-labelledby="form-dialog-title" disableBackdropClick>
-            <DialogTitle id="form-dialog-title">Place buy order</DialogTitle>
+            <DialogTitle id="form-dialog-title">Place sell order</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     {dialogContentText}
