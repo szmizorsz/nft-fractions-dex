@@ -122,6 +122,106 @@ contract NftFractionsRepository is
     }
 
     /**
+     * @dev when someone transfers his tokens to the other chain the bridge contract will call this burn function
+     * The bridge contract is the owner of NftFractionsRepository.
+     *
+     * Requirements:
+     * - only the owner (the bridge contract) can call
+     * - the contract is not paused
+     */
+    function burn(
+        uint256 tokenId,
+        uint256 amount,
+        address transferer
+    ) external onlyOwner() {
+        require(!paused(), "Not allowed while paused");
+        uint256 transferersAmount = balanceOf(transferer, tokenId);
+        require(
+            transferersAmount >= amount,
+            "transferer has to own equal or more shares than the given amount"
+        );
+        //burns the shares from ERC1155 token
+        _burn(transferer, tokenId, amount);
+        // if the transferer transfers all his amount
+        if (transferersAmount == amount) {
+            deleteIdFromTokenIdsByShareOwner(transferer, tokenId);
+            deleteOwnerFromOwnersByTokenId(transferer, tokenId);
+            // if no onwer left
+            if (ownersByTokenId[tokenId].length == 0) {
+                //deletes the ERC1155 token from the tokenIds array
+                uint256 nrOfTokens = tokenIds.length;
+                uint256 tokenIdPosition;
+                for (uint256 i; i < nrOfTokens; i++) {
+                    if (tokenId == tokenIds[i]) {
+                        tokenIdPosition = i;
+                        break;
+                    }
+                }
+                tokenIds[tokenIdPosition] = tokenIds[nrOfTokens - 1];
+                tokenIds.pop();
+                //deletes the token struct
+                delete tokens[tokenId];
+            }
+        }
+    }
+
+    /**
+     * @dev when someone transfers his tokens from the other chain to this chain the bridge contract will call this mint function
+     *
+     * Requirements:
+     * - only the owner (the bridge contract) can call
+     * - the contract is not paused
+     */
+    function mint(
+        address erc721ContractAddress,
+        uint256 erc721TokenId,
+        uint256 erc1155TokenId,
+        uint256 erc1155Amount,
+        address transferer
+    ) external onlyOwner() {
+        require(!paused(), "Not allowed while paused");
+        _mint(transferer, erc1155TokenId, erc1155Amount, "");
+        // if the token does not exist in this chain yet
+        if (tokens[erc1155TokenId].erc721ContractAddress == address(0)) {
+            Token memory token;
+            token.erc721ContractAddress = erc721ContractAddress;
+            token.erc721TokenId = erc721TokenId;
+            token.totalFractionsAmount = erc1155Amount;
+            tokens[erc1155TokenId] = token;
+            tokenIds.push(erc1155TokenId);
+        }
+        // Has to check if the transferer does not own this tokenId in this chain yet
+        uint256 nrOfTokensByTransferer =
+            tokenIdsByShareOwner[transferer].length;
+        if (nrOfTokensByTransferer == 0) {
+            tokenIdsByShareOwner[transferer].push(erc1155TokenId);
+        } else {
+            for (uint256 i; i < nrOfTokensByTransferer; i++) {
+                if (erc1155TokenId == tokenIdsByShareOwner[transferer][i]) {
+                    break;
+                }
+                if (i == nrOfTokensByTransferer - 1) {
+                    tokenIdsByShareOwner[transferer].push(erc1155TokenId);
+                }
+            }
+        }
+        // Has to check if the transferer is amoung the owners of this token in this chain
+        uint256 nrOfOwnerByTokenId = ownersByTokenId[erc1155TokenId].length;
+        if (nrOfOwnerByTokenId == 0) {
+            ownersByTokenId[erc1155TokenId].push(transferer);
+        } else {
+            for (uint256 i; i < nrOfOwnerByTokenId; i++) {
+                if (transferer == ownersByTokenId[erc1155TokenId][i]) {
+                    break;
+                }
+                if (i == nrOfOwnerByTokenId - 1) {
+                    ownersByTokenId[erc1155TokenId].push(transferer);
+                }
+            }
+        }
+    }
+
+    /**
      * @dev same as safeTransferFrom in ERC1155 with updating the internal data structures:
      * - updates the ownersByTokenId data structure
      * - updates the tokenIdsByShareOwner data structure
@@ -233,5 +333,23 @@ contract NftFractionsRepository is
             tokenIdPositionInShareOwner
         ] = tokenIdsByShareOwner[owner][nrOfTokensByShareOwner - 1];
         tokenIdsByShareOwner[owner].pop();
+    }
+
+    /**
+     * @dev helper to delete an owner from ownersByTokenId
+     */
+    function deleteOwnerFromOwnersByTokenId(address owner, uint256 id) private {
+        uint256 nrOfOwnersByTokenId = ownersByTokenId[id].length;
+        uint256 ownerPositionInOwners;
+        for (uint256 i; i < nrOfOwnersByTokenId; i++) {
+            if (owner == ownersByTokenId[id][i]) {
+                ownerPositionInOwners = i;
+                break;
+            }
+        }
+        ownersByTokenId[id][ownerPositionInOwners] = ownersByTokenId[id][
+            nrOfOwnersByTokenId - 1
+        ];
+        ownersByTokenId[id].pop();
     }
 }
