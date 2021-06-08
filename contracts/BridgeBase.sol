@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./NFTFractionsRepository.sol";
+import "./NftFractionsRepository.sol";
 
 contract BridgeBase is Ownable, Pausable {
     uint256 public nonce;
