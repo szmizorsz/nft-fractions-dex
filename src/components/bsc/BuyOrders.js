@@ -108,7 +108,7 @@ function BuyOrders({ orders, accounts, dexContract }) {
                 <TableHead>
                     <TableRow>
                         <TableCell />
-                        <TableCell>Price (ETH)</TableCell>
+                        <TableCell>Price (BNB)</TableCell>
                         <TableCell>Amount</TableCell>
                         <TableCell>Filled</TableCell>
                     </TableRow>

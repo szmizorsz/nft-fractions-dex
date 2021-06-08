@@ -5,7 +5,17 @@ import Button from '@material-ui/core/Button';
 import { GAS_LIMIT } from '../../config/settings.js'
 import Grid from '@material-ui/core/Grid';
 
-const NFTDescription = ({ accounts, nftFractionsRepositoryContract, tokenId, name, description, author, ownShares, totalShares }) => {
+const NFTDescription = ({
+    accounts,
+    nftFractionsRepositoryContract,
+    tokenId,
+    name,
+    description,
+    author,
+    ownShares,
+    totalShares,
+    setTokenTransferAccrossChainsDialogOpen
+}) => {
 
     const withdrawButtonDisplay = () => {
         if (ownShares === totalShares) {
@@ -20,7 +30,7 @@ const NFTDescription = ({ accounts, nftFractionsRepositoryContract, tokenId, nam
     const transferButtonDisplay = () => {
         if (ownShares > 0) {
             return <Box ml={30} >
-                <Button size="small" color="primary" onClick={() => { handleWithdrawSubmit(tokenId) }}>
+                <Button size="small" color="primary" onClick={() => { setTokenTransferAccrossChainsDialogOpen(true) }}>
                     Transfer
                 </Button>
             </Box>;

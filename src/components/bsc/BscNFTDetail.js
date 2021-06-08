@@ -28,6 +28,8 @@ import PlaceSellOrder from './PlaceSellOrder.js';
 import TokenTransferApprovalDialog from './TokenTransferApprovalDialog.js';
 import NftFractionsRepository from '../../contracts/bsc/NftFractionsRepository.json';
 import Dex from '../../contracts/bsc/Dex.json';
+import BscBridge from '../../contracts/bsc/BscBridge.json';
+import TokenTransferAcrossChainsDialog from './TokenTransferAcrossChainsDialog.js';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -48,6 +50,7 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
 
     const [nftFractionsRepositoryContract, setNftFractionsRepositoryContract] = useState(undefined);
     const [dexContract, setDexContract] = useState(undefined);
+    const [bscBridgeContract, setBscBridgeContract] = useState(undefined);
     const [metaData, setMetadata] = useState(undefined);
     const [owners, setOwners] = useState([]);
     const [totalShares, setTotalShares] = useState(0);
@@ -65,6 +68,7 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
     const [sharesAvailableForSelling, setSharesAvailableForSelling] = useState(0);
     const [tokenTransferDialogOpen, setTokenTransferDialogOpen] = useState(false);
     const [selectedNetwork, setSelectedNetwork] = useState(0);
+    const [tokenTransferAccrossChainsDialogOpen, setTokenTransferAccrossChainsDialogOpen] = useState(false);
 
     useEffect(() => {
         const init = async () => {
@@ -80,8 +84,14 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
                 Dex.abi,
                 deployedNetwork && deployedNetwork.address,
             );
+            deployedNetwork = BscBridge.networks[networkId];
+            const bscBridgeContract = new web3.eth.Contract(
+                BscBridge.abi,
+                deployedNetwork && deployedNetwork.address,
+            );
             setNftFractionsRepositoryContract(nftFractionsRepositoryContract);
             setDexContract(dexContract);
+            setBscBridgeContract(bscBridgeContract);
 
             const tokenData = await nftFractionsRepositoryContract.methods.getTokenData(tokenId).call();
             const erc721 = new web3.eth.Contract(ERC721.abi, tokenData.erc721ContractAddress);
@@ -148,6 +158,7 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
             typeof nftFractionsRepositoryContract !== 'undefined'
             && typeof metaData !== 'undefined'
             && typeof dexContract !== 'undefined'
+            && typeof bscBridgeContract !== 'undefined'
             && typeof web3 !== 'undefined'
             && typeof accounts !== 'undefined'
             && selectedNetwork === 97
@@ -175,7 +186,8 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
                             description={metaData.description}
                             author={metaData.author}
                             ownShares={myShares}
-                            totalShares={totalShares} />
+                            totalShares={totalShares}
+                            setTokenTransferAccrossChainsDialogOpen={setTokenTransferAccrossChainsDialogOpen} />
                         <div className={classes.root}>
                             <Accordion>
                                 <AccordionSummary
@@ -275,6 +287,15 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
                 accounts={accounts}
                 setTokenTransferDialogOpen={setTokenTransferDialogOpen}
                 dexContractAddress={dexContract._address} />
+            <TokenTransferAcrossChainsDialog
+                erc721ContractAddress={originalContract}
+                erc721TokenId={originalTokenId}
+                erc1155TokenId={tokenId}
+                ownSharesAmount={myShares}
+                accounts={accounts}
+                bscBridgeContract={bscBridgeContract}
+                tokenTransferAccrossChainsDialogOpen={tokenTransferAccrossChainsDialogOpen}
+                setTokenTransferAccrossChainsDialogOpen={setTokenTransferAccrossChainsDialogOpen} />
         </>
     );
 }
