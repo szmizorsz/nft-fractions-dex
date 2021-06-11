@@ -6,8 +6,6 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import MyNFTs from './MyNFTs.js'
 import AllNFTs from './AllNFTs.js'
-import { Button } from '@material-ui/core/'
-import DepositNft from './DepositNft.js'
 import Grid from '@material-ui/core/Grid';
 import BnbBalance from './BnbBalance.js'
 import NftFractionsRepository from '../../contracts/bsc/NftFractionsRepository.json';
@@ -85,7 +83,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const BscLandingPage = ({ web3, accounts, ipfs }) => {
-    const [nftDepositDialogOpen, setNftDepositDialogOpen] = useState(false);
     const [nftFractionsRepositoryContract, setNftFractionsRepositoryContract] = useState(undefined);
     const [dexContract, setDexContract] = useState(undefined);
     const [selectedNetwork, setSelectedNetwork] = useState(0);
@@ -150,17 +147,6 @@ const BscLandingPage = ({ web3, accounts, ipfs }) => {
                         </div>
                     </div>
                 </Grid>
-                <Grid item xs={12} md={2}>
-                    <Box mt={1.5} ml={7}>
-                        <Button
-                            onClick={() => { setNftDepositDialogOpen(true) }}
-                            variant="outlined"
-                            type="submit">
-                            Deposit NFT
-                        </Button>
-                    </Box>
-                </Grid>
-                <Grid item md={2}></Grid>
             </Grid>
             <TabPanel value={value} index={0}>
                 <AllNFTs
@@ -181,12 +167,6 @@ const BscLandingPage = ({ web3, accounts, ipfs }) => {
                     accounts={accounts}
                     dexContract={dexContract} />
             </TabPanel>
-            <DepositNft
-                web3={web3}
-                accounts={accounts}
-                nftFractionsRepositoryContract={nftFractionsRepositoryContract}
-                nftDepositDialogOpen={nftDepositDialogOpen}
-                setNftDepositDialogOpen={setNftDepositDialogOpen} />
         </>
     )
 }
