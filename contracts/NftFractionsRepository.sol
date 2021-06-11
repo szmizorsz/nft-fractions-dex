@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
@@ -21,6 +21,7 @@ contract NftFractionsRepository is
         address erc721ContractAddress;
         uint256 erc721TokenId;
         uint256 totalFractionsAmount;
+        string tokenURI;
     }
 
     CountersUpgradeable.Counter private _ids;
@@ -57,7 +58,8 @@ contract NftFractionsRepository is
         uint256 fractionsAmountToMint
     ) external {
         require(!paused(), "Not allowed while paused");
-        IERC721 erc721Contract = IERC721(erc721ContractAddress);
+        ERC721URIStorage erc721Contract =
+            ERC721URIStorage(erc721ContractAddress);
         require(
             erc721Contract.ownerOf(erc721TokenId) == msg.sender,
             "msg sender has to own the token to deposit"
@@ -66,10 +68,13 @@ contract NftFractionsRepository is
         _ids.increment();
         uint256 newItemId = _ids.current();
         _mint(msg.sender, newItemId, fractionsAmountToMint, "");
+        string memory tokenURI;
+        tokenURI = erc721Contract.tokenURI(erc721TokenId);
         Token memory token;
         token.erc721ContractAddress = erc721ContractAddress;
         token.erc721TokenId = erc721TokenId;
         token.totalFractionsAmount = fractionsAmountToMint;
+        token.tokenURI = tokenURI;
         tokens[newItemId] = token;
         tokenIdsByShareOwner[msg.sender].push(newItemId);
         ownersByTokenId[newItemId].push(msg.sender);
@@ -177,7 +182,9 @@ contract NftFractionsRepository is
         uint256 erc721TokenId,
         uint256 erc1155TokenId,
         uint256 erc1155Amount,
-        address transferer
+        uint256 totalFractionsAmount,
+        address transferer,
+        string memory tokenURI
     ) external onlyOwner() {
         require(!paused(), "Not allowed while paused");
         _mint(transferer, erc1155TokenId, erc1155Amount, "");
@@ -186,7 +193,8 @@ contract NftFractionsRepository is
             Token memory token;
             token.erc721ContractAddress = erc721ContractAddress;
             token.erc721TokenId = erc721TokenId;
-            token.totalFractionsAmount = erc1155Amount;
+            token.totalFractionsAmount = totalFractionsAmount;
+            token.tokenURI = tokenURI;
             tokens[erc1155TokenId] = token;
             tokenIds.push(erc1155TokenId);
         }
@@ -272,14 +280,38 @@ contract NftFractionsRepository is
         returns (
             address erc721ContractAddress,
             uint256 erc721TokenId,
-            uint256 totalFractionsAmount
+            uint256 totalFractionsAmount,
+            string memory tokenURI
         )
     {
         return (
             tokens[_tokenId].erc721ContractAddress,
             tokens[_tokenId].erc721TokenId,
-            tokens[_tokenId].totalFractionsAmount
+            tokens[_tokenId].totalFractionsAmount,
+            tokens[_tokenId].tokenURI
         );
+    }
+
+    /**
+     * @dev returns amount of fractions minted for a token
+     */
+    function getTotalFractionsAmount(uint256 _tokenId)
+        public
+        view
+        returns (uint256)
+    {
+        return (tokens[_tokenId].totalFractionsAmount);
+    }
+
+    /**
+     * @dev returns original ERC721 contract address for a token
+     */
+    function getErc721ContractAddress(uint256 _tokenId)
+        public
+        view
+        returns (address)
+    {
+        return (tokens[_tokenId].erc721ContractAddress);
     }
 
     function pause() public onlyOwner() {

@@ -125,14 +125,9 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
             );
             sharesReserved[msg.sender][tokenId] += amount;
         } else {
-            address erc721ContractAddress;
-            uint256 erc721TokenId;
             uint256 totalFractionsAmount;
-            (
-                erc721ContractAddress,
-                erc721TokenId,
-                totalFractionsAmount
-            ) = nftFractionsRepository.getTokenData(tokenId);
+            totalFractionsAmount = nftFractionsRepository
+                .getTotalFractionsAmount(tokenId);
             require(
                 totalFractionsAmount >= amount,
                 "total amount of fractions is lower than the given amount"
@@ -284,13 +279,8 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
 
     modifier tokenExist(uint256 tokenId) {
         address erc721ContractAddress;
-        uint256 erc721TokenId;
-        uint256 totalFractionsAmount;
-        (
-            erc721ContractAddress,
-            erc721TokenId,
-            totalFractionsAmount
-        ) = nftFractionsRepository.getTokenData(tokenId);
+        (erc721ContractAddress) = nftFractionsRepository
+            .getErc721ContractAddress(tokenId);
         require(
             erc721ContractAddress != address(0),
             "this token does not exist"

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { withRouter } from "react-router";
 import NFTCard from './NFTCard.js'
 import { BufferList } from "bl";
-import ERC721 from '../../contracts/bsc/ERC721.json';
 import TokenOwners from './TokenOwners.js';
 import Grid from '@material-ui/core/Grid';
 import NFTDescription from './NFTDescription.js'
@@ -94,8 +93,7 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
             setBscBridgeContract(bscBridgeContract);
 
             const tokenData = await nftFractionsRepositoryContract.methods.getTokenData(tokenId).call();
-            const erc721 = new web3.eth.Contract(ERC721.abi, tokenData.erc721ContractAddress);
-            const tokenURI = await erc721.methods.tokenURI(tokenData.erc721TokenId).call();
+            const tokenURI = tokenData.tokenURI;
             let nftMetadataFromIPFS = { name: 'name' };
             for await (const file of ipfs.get(tokenURI)) {
                 const content = new BufferList()
@@ -207,7 +205,7 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
                                     aria-controls="panel2a-content"
                                     id="panel2a-header"
                                 >
-                                    <Typography className={classes.heading}>Original contract</Typography>
+                                    <Typography className={classes.heading}>Original contract (on Matic)</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <TableContainer className={classes.table} component={Paper}>

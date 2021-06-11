@@ -33,7 +33,7 @@ const TokenTransferAcrossChainsDialog = ({
             gas: GAS_LIMIT,
             from: accounts[0]
         }
-        await bscBridgeContract.methods.burn(accounts[0], erc1155TokenId, amount, erc721ContractAddress, erc721TokenId).send(config);
+        await bscBridgeContract.methods.burn(accounts[0], erc1155TokenId, amount).send(config);
         handleCloseWithDialogContentTextReset();
     };
 

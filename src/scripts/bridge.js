@@ -30,7 +30,7 @@ const pollMatic = async (blockHeight) => {
         { fromBlock: lastProcessedMaticBlockHeight, step: 0 }
     );
     for (transferEvent of transferEvents) {
-        const { from, to, erc1155TokenId, erc1155Amount, erc721ContractAddress, erc721TokenId, date, nonce, step } = transferEvent.returnValues;
+        const { from, to, erc1155TokenId, erc1155Amount, totalFractionsAmount, erc721ContractAddress, erc721TokenId, tokenURI, date, nonce, step } = transferEvent.returnValues;
         console.log(`
         Transfer event from Matic to process:
         - from ${from} 
@@ -39,12 +39,14 @@ const pollMatic = async (blockHeight) => {
         - erc1155Amount ${erc1155Amount}
         - erc721ContractAddress ${erc721ContractAddress}
         - erc721TokenId ${erc721TokenId}
+        - totalFractionsAmount ${totalFractionsAmount}
+        - tokenURI ${tokenURI}
         - date ${date}
         - nonce ${nonce}
         - step ${step}
       `);
         if (step == 0 && nonce > lastProcessedMaticNonce) {
-            const tx = bscBridge.methods.mint(from, to, erc721ContractAddress, erc721TokenId, erc1155TokenId, erc1155Amount, nonce);
+            const tx = bscBridge.methods.mint(from, to, erc721ContractAddress, erc721TokenId, erc1155TokenId, erc1155Amount, totalFractionsAmount, nonce, tokenURI);
             const [gasPrice, gasCost] = await Promise.all([
                 web3Bsc.eth.getGasPrice(),
                 tx.estimateGas({ from: admin }),

@@ -13,6 +13,7 @@ contract("NftFractionsRepository", async function (accounts) {
 	beforeEach(async function () {
 		erc721MockInstance = await ERC721Mock.new();
 		await erc721MockInstance.mint(nftOwner, erc721TokenId);
+		await erc721MockInstance.setTokenURI(erc721TokenId, "tokenURI");
 		nftFractionsRepositoryInstance = await deployProxy(NftFractionsRepository, ["URI"]);
 		await erc721MockInstance.approve(nftFractionsRepositoryInstance.address, erc721TokenId, { from: nftOwner });
 	});
@@ -25,6 +26,7 @@ contract("NftFractionsRepository", async function (accounts) {
 		assert(tokenDataFromNftFractionsRepositoryInstance.erc721ContractAddress === erc721MockInstance.address);
 		assert(tokenDataFromNftFractionsRepositoryInstance.erc721TokenId.toNumber() === erc721TokenId);
 		assert(tokenDataFromNftFractionsRepositoryInstance.totalFractionsAmount.toNumber() === fractionsAmount);
+		assert(tokenDataFromNftFractionsRepositoryInstance.tokenURI === "tokenURI");
 	});
 
 	it("should not deposit the nft token if not the onwer sends", async function () {

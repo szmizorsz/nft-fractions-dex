@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BufferList } from "bl";
-import ERC721 from '../../contracts/matic/ERC721.json';
 import NFTCards from './NFTCards.js'
 
-const MyNFTs = ({ web3, accounts, nftFractionsRepositoryContract, ipfs }) => {
+const MyNFTs = ({ accounts, nftFractionsRepositoryContract, ipfs }) => {
     const [nftList, setNftList] = useState([]);
 
     useEffect(() => {
@@ -13,8 +12,7 @@ const MyNFTs = ({ web3, accounts, nftFractionsRepositoryContract, ipfs }) => {
             for (let tokenId of tokenIds) {
                 const tokenData = await nftFractionsRepositoryContract.methods.getTokenData(tokenId).call();
                 const myShares = await nftFractionsRepositoryContract.methods.balanceOf(accounts[0], tokenId).call()
-                const erc721 = new web3.eth.Contract(ERC721.abi, tokenData.erc721ContractAddress);
-                const tokenURI = await erc721.methods.tokenURI(tokenData.erc721TokenId).call();
+                const tokenURI = tokenData.tokenURI;
                 let nftMetadataFromIPFS;
                 for await (const file of ipfs.get(tokenURI)) {
                     const content = new BufferList()
