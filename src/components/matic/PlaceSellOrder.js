@@ -53,6 +53,7 @@ const PlaceSellOrder = ({
         if (marketPerLimit === 'market') {
             await dexContract.methods.createMarketOrder(tokenId, amount, 1).send(config);
         } else {
+            debugger
             const weiPrice = web3.utils.toWei(price.toString(), 'ether');
             await dexContract.methods.createLimitOrder(tokenId, amount, weiPrice, 1).send(config);
             setTokenTransferDialogOpen(true);

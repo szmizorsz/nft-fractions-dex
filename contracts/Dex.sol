@@ -215,6 +215,9 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
                 );
                 ethBalance[msg.sender] += orders[i].price * matched;
                 ethBalance[orders[i].trader] -= orders[i].price * matched;
+                ethReservedBalance[orders[i].trader] -=
+                    orders[i].price *
+                    matched;
             }
             if (side == Side.BUY) {
                 require(
@@ -231,6 +234,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
                 );
                 ethBalance[msg.sender] -= orders[i].price * matched;
                 ethBalance[orders[i].trader] += orders[i].price * matched;
+                sharesReserved[orders[i].trader][tokenId] -= matched;
             }
             i++;
         }
@@ -271,6 +275,13 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
                     msg.sender == orders[i].trader,
                     "Only the trader can delete his order"
                 );
+                if (orders[i].side == Side.BUY) {
+                    ethReservedBalance[msg.sender] -=
+                        orders[i].amount *
+                        orders[i].price;
+                } else {
+                    sharesReserved[msg.sender][tokenId] -= orders[i].amount;
+                }
                 orders[i] = orders[orders.length - 1];
                 orders.pop();
             }

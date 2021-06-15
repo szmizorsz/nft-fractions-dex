@@ -138,6 +138,9 @@ contract("Dex orders", async function (accounts) {
         let price = 2;
         let buySide = 0;
         await dexInstance.createLimitOrder(erc1155TokenId, amount, price, buySide, { from: buyer });
+        let reservedBalance = await dexInstance.getEthReserveBalance(buyer);
+        assert(reservedBalance.toNumber() == amount * price);
+
         let sellSide = 1;
         let sellAmount = 40;
         let result = await dexInstance.createMarketOrder(erc1155TokenId, sellAmount, sellSide, { from: nftOwner });
@@ -170,6 +173,9 @@ contract("Dex orders", async function (accounts) {
         assert(originalOwnerBalance.toNumber() === 60);
         let buyerBalance = await nftFractionsRepositoryInstance.balanceOf(buyer, erc1155TokenId);
         assert(buyerBalance.toNumber() === 40);
+
+        reservedBalance = await dexInstance.getEthReserveBalance(buyer);
+        assert(reservedBalance.toNumber() == (amount - sellAmount) * price);
     });
 
     it("should create sell market order and match to two buy limit orders", async function () {
@@ -226,6 +232,9 @@ contract("Dex orders", async function (accounts) {
         let price = 2;
         let sellSide = 1;
         await dexInstance.createLimitOrder(erc1155TokenId, amount, price, sellSide, { from: nftOwner });
+        let sharesReserved = await dexInstance.getSharesReserveBalance(nftOwner, erc1155TokenId, { from: nftOwner });
+        assert(sharesReserved.toNumber() === amount);
+
         let buySide = 0;
         let buyAmount = 40;
         let result = await dexInstance.createMarketOrder(erc1155TokenId, buyAmount, buySide, { from: buyer });
@@ -249,6 +258,9 @@ contract("Dex orders", async function (accounts) {
         assert(orders[0].trader == nftOwner);
         assert(orders[0].tokenId == erc1155TokenId);
         assert(orders[0].filled == buyAmount);
+
+        sharesReserved = await dexInstance.getSharesReserveBalance(nftOwner, erc1155TokenId, { from: nftOwner });
+        assert(sharesReserved.toNumber() === amount - buyAmount);
     });
 
     it("should create buy market order and match fully to one sell limit order", async function () {

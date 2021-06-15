@@ -47,6 +47,7 @@ module.exports = {
       network_id: "*",       // Any network (default: none)
     },
     maticMumbai: {
+      networkCheckTimeout: 10000,
       provider: () => new HDWalletProvider(mnemonic, `https://rpc-mumbai.matic.today`),
       network_id: 80001,
       confirmations: 2,
