@@ -1,5 +1,4 @@
 import React from 'react';
-import { GAS_LIMIT } from '../../config/settings.js'
 import { TextField, Button } from '@material-ui/core/'
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -23,7 +22,6 @@ const WithdrawBnbDialog = ({ bnbBalance, accounts, dexContract, bnbWithdrawDialo
 
         const weiAmount = Web3.utils.toWei(amount.toString(), 'ether');
         let config = {
-            gas: GAS_LIMIT,
             from: accounts[0]
         }
         await dexContract.methods.withdrawEth(weiAmount).send(config);

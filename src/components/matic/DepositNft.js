@@ -1,5 +1,4 @@
 import React from 'react';
-import { GAS_LIMIT } from '../../config/settings.js'
 import { TextField, Button } from '@material-ui/core/'
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -18,7 +17,6 @@ const DepositNft = ({ web3, accounts, nftFractionsRepositoryContract, nftDeposit
 
     const handleSubmit = async () => {
         let config = {
-            gas: GAS_LIMIT,
             from: accounts[0]
         }
         const erc721contract = new web3.eth.Contract(ERC721.abi, originalContract);

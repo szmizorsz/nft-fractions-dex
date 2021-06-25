@@ -2,7 +2,6 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { Box } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import { GAS_LIMIT } from '../../config/settings.js'
 import Grid from '@material-ui/core/Grid';
 
 const NFTDescription = ({
@@ -39,7 +38,6 @@ const NFTDescription = ({
 
     const handleWithdrawSubmit = async () => {
         let config = {
-            gas: GAS_LIMIT,
             from: accounts[0]
         }
         await nftFractionsRepositoryContract.methods.withdrawNft(tokenId).send(config);

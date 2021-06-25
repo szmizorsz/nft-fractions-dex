@@ -5,7 +5,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { GAS_LIMIT } from '../../config/settings.js'
 import Alert from '@material-ui/lab/Alert';
 
 function TokenTransferApprovalDialog({ open, nftFractionsRepositoryContract, accounts, setTokenTransferDialogOpen, dexContractAddress }) {
@@ -14,7 +13,6 @@ function TokenTransferApprovalDialog({ open, nftFractionsRepositoryContract, acc
 
     const handleApproval = async () => {
         let config = {
-            gas: GAS_LIMIT,
             from: accounts[0]
         }
         await nftFractionsRepositoryContract.methods.setApprovalForAll(dexContractAddress, true).send(config)

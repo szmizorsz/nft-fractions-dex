@@ -17,7 +17,6 @@ import Grid from '@material-ui/core/Grid';
 import { TextField } from '@material-ui/core/';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
-import { GAS_LIMIT } from '../../config/settings.js'
 
 const useStyles = makeStyles({
     table: {
@@ -44,7 +43,6 @@ const deleteIconDisplay = (row, accounts, dexContract) => {
 
 const handleOrderDelete = async (tokenId, orderId, accounts, dexContract) => {
     let config = {
-        gas: GAS_LIMIT,
         from: accounts[0]
     };
     await dexContract.methods.deleteOrder(tokenId, 0, orderId).send(config);

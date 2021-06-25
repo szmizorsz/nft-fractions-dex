@@ -1,5 +1,4 @@
 import React from 'react';
-import { GAS_LIMIT } from '../../config/settings.js'
 import { TextField, Button } from '@material-ui/core/'
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -47,7 +46,6 @@ const PlaceSellOrder = ({
             return;
         }
         let config = {
-            gas: GAS_LIMIT,
             from: accounts[0]
         }
         if (marketPerLimit === 'market') {
