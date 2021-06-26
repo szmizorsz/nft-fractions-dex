@@ -53,13 +53,15 @@ const MaticBalance = ({ accounts, dexContract }) => {
                 accounts={accounts}
                 dexContract={dexContract}
                 maticDepositDialogOpen={maticDepositDialogOpen}
-                setMaticDepositDialogOpen={setMaticDepositDialogOpen} />
+                setMaticDepositDialogOpen={setMaticDepositDialogOpen}
+                setMaticBalance={setMaticBalance} />
             <WithdrawMaticDialog
                 maticBalance={maticBalance}
                 accounts={accounts}
                 dexContract={dexContract}
                 maticWithdrawDialogOpen={maticWithdrawDialogOpen}
-                setMaticWithdrawDialogOpen={setMaticWithdrawDialogOpen} />
+                setMaticWithdrawDialogOpen={setMaticWithdrawDialogOpen}
+                setMaticBalance={setMaticBalance} />
         </>
     )
 

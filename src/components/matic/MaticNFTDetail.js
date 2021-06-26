@@ -235,7 +235,7 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
                             <Box mb={3}>
                                 <Typography className={classes.heading}>Buy Orders</Typography>
                             </Box>
-                            <BuyOrders orders={buyOrders} accounts={accounts} dexContract={dexContract} />
+                            <BuyOrders orders={buyOrders} accounts={accounts} dexContract={dexContract} setBuyOrders={setBuyOrders} web3={web3} />
                             <Button
                                 onClick={() => { setPlaceBuyOrderDialogOpen(true) }}
                                 variant="outlined"
@@ -248,7 +248,7 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
                             <Box mb={3}>
                                 <Typography className={classes.heading}>Sell Orders</Typography>
                             </Box>
-                            <SellOrders orders={sellOrders} accounts={accounts} dexContract={dexContract} />
+                            <SellOrders orders={sellOrders} accounts={accounts} dexContract={dexContract} setSellOrders={setSellOrders} web3={web3} />
                             <Button
                                 onClick={() => { setPlaceSellOrderDialogOpen(true) }}
                                 variant="outlined"
@@ -268,7 +268,8 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
                 dexContract={dexContract}
                 placeBuyOrderDialogOpen={placeBuyOrderDialogOpen}
                 setPlaceBuyOrderDialogOpen={setPlaceBuyOrderDialogOpen}
-                sellOrderAvailable={sellOrderAvailable} />
+                sellOrderAvailable={sellOrderAvailable}
+                setBuyOrders={setBuyOrders} />
             <PlaceSellOrder
                 web3={web3}
                 tokenId={tokenId}
@@ -278,7 +279,8 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
                 setPlaceSellOrderDialogOpen={setPlaceSellOrderDialogOpen}
                 buyOrderAvailable={buyOrderAvailable}
                 sharesAvailableForSelling={sharesAvailableForSelling}
-                setTokenTransferDialogOpen={setTokenTransferDialogOpen} />
+                setTokenTransferDialogOpen={setTokenTransferDialogOpen}
+                setSellOrders={setSellOrders} />
             <TokenTransferApprovalDialog
                 open={tokenTransferDialogOpen}
                 nftFractionsRepositoryContract={nftFractionsRepositoryContract}
