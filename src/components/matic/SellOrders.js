@@ -110,7 +110,7 @@ const Row = ({ row, accounts, dexContract, setSellOrders, web3 }) => {
     )
 }
 
-function SellOrders({ orders, accounts, dexContract }) {
+function SellOrders({ orders, accounts, dexContract, setSellOrders, web3 }) {
     const classes = useStyles();
 
     const rowsDisplay = () => {
@@ -121,7 +121,7 @@ function SellOrders({ orders, accounts, dexContract }) {
         } else {
             return <TableBody>
                 {orders.map((row) => (
-                    <Row row={row} accounts={accounts} dexContract={dexContract} />
+                    <Row row={row} accounts={accounts} dexContract={dexContract} setSellOrders={setSellOrders} web3={web3} />
                 ))}
             </TableBody>
         }

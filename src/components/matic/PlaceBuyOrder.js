@@ -66,12 +66,7 @@ const PlaceBuyOrder = ({
                 .on("receipt", async function (receipt) {
                     setTransactionNotificationText("Transaction has been confirmed");
                     setTransactionNotificationOpen(true);
-                    const buyOrdersFromChain = await dexContract.methods.getOrders(tokenId, 0).call();
-                    const buyOrdersExtended = buyOrdersFromChain.map((item) => ({
-                        ...item,
-                        ethPrice: web3.utils.fromWei(item.price, 'ether')
-                    }));
-                    setBuyOrders(buyOrdersExtended);
+                    window.location.reload();
                 })
                 .on("error", function (error) {
                     setTransactionNotificationText("Transaction error: " + error);

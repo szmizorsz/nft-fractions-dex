@@ -6,6 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Alert from '@material-ui/lab/Alert';
+import TransactionNotification from './TransactionNotification.js';
 
 const TokenTransferAcrossChainsDialog = ({
     erc721ContractAddress,
@@ -19,7 +20,8 @@ const TokenTransferAcrossChainsDialog = ({
 }) => {
     const defaultDialogContentText = 'Please, specify the amount of shares to transfer to the Matic chain.';
     const [dialogContentText, setDialogContentText] = React.useState(defaultDialogContentText);
-
+    const [transactionNotificationOpen, setTransactionNotificationOpen] = React.useState(false);
+    const [transactionNotificationText, setTransactionNotificationText] = React.useState("");
     const [amount, setAmount] = React.useState('');
 
     const handleSubmit = async () => {
@@ -31,7 +33,20 @@ const TokenTransferAcrossChainsDialog = ({
         let config = {
             from: accounts[0]
         }
-        await bscBridgeContract.methods.burn(accounts[0], erc1155TokenId, amount).send(config);
+        await bscBridgeContract.methods.burn(accounts[0], erc1155TokenId, amount).send(config)
+            .on("transactionHash", function (transactionHash) {
+                setTransactionNotificationText("Transaction sent: " + transactionHash);
+                setTransactionNotificationOpen(true);
+                setTokenTransferAccrossChainsDialogOpen(false);
+            })
+            .on("receipt", async function (receipt) {
+                setTransactionNotificationText("Transaction has been confirmed");
+                setTransactionNotificationOpen(true);
+            })
+            .on("error", function (error) {
+                setTransactionNotificationText("Transaction error: " + error);
+                setTransactionNotificationOpen(true);
+            });
         handleCloseWithDialogContentTextReset();
     };
 
@@ -69,6 +84,11 @@ const TokenTransferAcrossChainsDialog = ({
                     </Button>
                 </DialogActions>
             </Dialog>
+            < TransactionNotification
+                open={transactionNotificationOpen}
+                text={transactionNotificationText}
+                setOpen={setTransactionNotificationOpen}
+            />
         </>
     )
 

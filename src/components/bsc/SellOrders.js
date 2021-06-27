@@ -17,6 +17,7 @@ import Grid from '@material-ui/core/Grid';
 import { TextField } from '@material-ui/core/';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
+import TransactionNotification from './TransactionNotification.js';
 
 const useStyles = makeStyles({
     table: {
@@ -29,28 +30,48 @@ const useStyles = makeStyles({
     },
 });
 
-const deleteIconDisplay = (row, accounts, dexContract) => {
-    let deleteIcon;
-    if (row.trader === accounts[0]) {
-        deleteIcon = <Tooltip title="Delete">
-            <IconButton aria-label="delete" onClick={() => { handleOrderDelete(row.tokenId, row.id, accounts, dexContract) }}>
-                <DeleteIcon />
-            </IconButton>
-        </Tooltip>;
-    }
-    return deleteIcon;
-}
-
-const handleOrderDelete = async (tokenId, orderId, accounts, dexContract) => {
-    let config = {
-        from: accounts[0]
-    };
-    await dexContract.methods.deleteOrder(tokenId, 1, orderId).send(config);
-}
-
-const Row = ({ row, accounts, dexContract }) => {
+const Row = ({ row, accounts, dexContract, setSellOrders, web3 }) => {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
+    const [transactionNotificationOpen, setTransactionNotificationOpen] = React.useState(false);
+    const [transactionNotificationText, setTransactionNotificationText] = React.useState("");
+
+    const deleteIconDisplay = (row, accounts, dexContract) => {
+        let deleteIcon;
+        if (row.trader === accounts[0]) {
+            deleteIcon = <Tooltip title="Delete">
+                <IconButton aria-label="delete" onClick={() => { handleOrderDelete(row.tokenId, row.id, accounts, dexContract) }}>
+                    <DeleteIcon />
+                </IconButton>
+            </Tooltip>;
+        }
+        return deleteIcon;
+    }
+
+    const handleOrderDelete = async (tokenId, orderId, accounts, dexContract) => {
+        let config = {
+            from: accounts[0]
+        };
+        await dexContract.methods.deleteOrder(tokenId, 1, orderId).send(config)
+            .on("transactionHash", function (transactionHash) {
+                setTransactionNotificationText("Transaction sent: " + transactionHash);
+                setTransactionNotificationOpen(true);
+            })
+            .on("receipt", async function (receipt) {
+                setTransactionNotificationText("Transaction has been confirmed");
+                setTransactionNotificationOpen(true);
+                const sellOrdersFromChain = await dexContract.methods.getOrders(tokenId, 1).call();
+                const sellOrdersExtended = sellOrdersFromChain.map((item) => ({
+                    ...item,
+                    ethPrice: web3.utils.fromWei(item.price, 'ether')
+                }));
+                setSellOrders(sellOrdersExtended);
+            })
+            .on("error", function (error) {
+                setTransactionNotificationText("Transaction error: " + error);
+                setTransactionNotificationOpen(true);
+            });
+    }
 
     return (
         <>
@@ -79,11 +100,16 @@ const Row = ({ row, accounts, dexContract }) => {
                     </Collapse>
                 </TableCell>
             </TableRow>
+            < TransactionNotification
+                open={transactionNotificationOpen}
+                text={transactionNotificationText}
+                setOpen={setTransactionNotificationOpen}
+            />
         </>
     )
 }
 
-function SellOrders({ orders, accounts, dexContract }) {
+function SellOrders({ orders, accounts, dexContract, setSellOrders, web3 }) {
     const classes = useStyles();
 
     const rowsDisplay = () => {
@@ -94,7 +120,7 @@ function SellOrders({ orders, accounts, dexContract }) {
         } else {
             return <TableBody>
                 {orders.map((row) => (
-                    <Row row={row} accounts={accounts} dexContract={dexContract} />
+                    <Row row={row} accounts={accounts} dexContract={dexContract} setSellOrders={setSellOrders} web3={web3} />
                 ))}
             </TableBody>
         }

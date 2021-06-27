@@ -53,13 +53,15 @@ const BnbBalance = ({ accounts, dexContract }) => {
                 accounts={accounts}
                 dexContract={dexContract}
                 bnbDepositDialogOpen={bnbDepositDialogOpen}
-                setBnbDepositDialogOpen={setBnbDepositDialogOpen} />
+                setBnbDepositDialogOpen={setBnbDepositDialogOpen}
+                setBnbBalance={setBnbBalance} />
             <WithdrawBnbDialog
                 bnbBalance={bnbBalance}
                 accounts={accounts}
                 dexContract={dexContract}
                 bnbWithdrawDialogOpen={bnbWithdrawDialogOpen}
-                setBnbWithdrawDialogOpen={setBnbWithdrawDialogOpen} />
+                setBnbWithdrawDialogOpen={setBnbWithdrawDialogOpen}
+                setBnbBalance={setBnbBalance} />
         </>
     )
 

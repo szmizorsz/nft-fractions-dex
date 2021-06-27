@@ -62,12 +62,7 @@ const PlaceSellOrder = ({
                 .on("receipt", async function (receipt) {
                     setTransactionNotificationText("Transaction has been confirmed");
                     setTransactionNotificationOpen(true);
-                    const sellOrdersFromChain = await dexContract.methods.getOrders(tokenId, 1).call();
-                    const sellOrdersExtended = sellOrdersFromChain.map((item) => ({
-                        ...item,
-                        ethPrice: web3.utils.fromWei(item.price, 'ether')
-                    }));
-                    setSellOrders(sellOrdersExtended);
+                    window.location.reload();
                 })
                 .on("error", function (error) {
                     setTransactionNotificationText("Transaction error: " + error);

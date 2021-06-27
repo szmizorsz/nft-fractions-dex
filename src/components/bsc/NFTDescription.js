@@ -5,9 +5,6 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
 const NFTDescription = ({
-    accounts,
-    nftFractionsRepositoryContract,
-    tokenId,
     name,
     description,
     author,
@@ -15,16 +12,6 @@ const NFTDescription = ({
     totalShares,
     setTokenTransferAccrossChainsDialogOpen
 }) => {
-
-    const withdrawButtonDisplay = () => {
-        if (ownShares === totalShares) {
-            return <Box ml={30} >
-                <Button size="small" color="primary" onClick={() => { handleWithdrawSubmit(tokenId) }}>
-                    Withdraw
-                </Button>
-            </Box>;
-        }
-    }
 
     const transferButtonDisplay = () => {
         if (ownShares > 0) {
@@ -36,13 +23,6 @@ const NFTDescription = ({
         }
     }
 
-    const handleWithdrawSubmit = async () => {
-        let config = {
-            from: accounts[0]
-        }
-        await nftFractionsRepositoryContract.methods.withdrawNft(tokenId).send(config);
-    };
-
     return (
         <>
             <Box mt={1}><Typography variant="h5" >{name}</Typography></Box>
@@ -52,7 +32,6 @@ const NFTDescription = ({
             <Box mb={1}>
                 <Grid container>
                     <Grid item xs={12} md={2}>
-                        <Box ml={6}><Typography>{withdrawButtonDisplay()}</Typography></Box>
                     </Grid>
                     <Grid item xs={12} md={2}>
                         <Box ml={10}><Typography>{transferButtonDisplay()}</Typography></Box>
