@@ -4,3 +4,5 @@ export const IPFS = {
     PROTOCOL: "https",
     PUBLIC_GATEWAY: "https://ipfs.io/ipfs/"
 }
+
+export const GRAPH_API_URL = "https://api.thegraph.com/subgraphs/name/szmizorsz/nft-fractions-dex"

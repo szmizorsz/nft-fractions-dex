@@ -21,6 +21,7 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const fs = require('fs');
 const mnemonic = fs.readFileSync(".secret").toString().trim();
+const infuraKey = fs.readFileSync(".infura_key").toString().trim();
 
 module.exports = {
   /**
@@ -47,8 +48,8 @@ module.exports = {
       network_id: "*",       // Any network (default: none)
     },
     maticMumbai: {
-      networkCheckTimeout: 10000,
-      provider: () => new HDWalletProvider(mnemonic, `https://rpc-mumbai.matic.today`),
+      networkCheckTimeout: 100000,
+      provider: () => new HDWalletProvider(mnemonic, `https://polygon-mumbai.infura.io/v3/` + infuraKey),
       network_id: 80001,
       confirmations: 2,
       timeoutBlocks: 200,

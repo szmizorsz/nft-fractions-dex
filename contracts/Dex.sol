@@ -6,12 +6,15 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./NftFractionsRepository.sol";
+import "./INftFractionsRepository.sol";
 
 contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
-    enum Side {BUY, SELL}
+    enum Side {
+        BUY,
+        SELL
+    }
 
     struct Order {
         uint256 id;
@@ -39,7 +42,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
     mapping(address => uint256) ethReservedBalance;
     mapping(uint256 => mapping(uint256 => Order[])) orderBook;
     mapping(address => mapping(uint256 => uint256)) sharesReserved;
-    NftFractionsRepository nftFractionsRepository;
+    INftFractionsRepository nftFractionsRepository;
 
     function initialize() public initializer {
         __Context_init_unchained();
@@ -51,7 +54,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
         public
         onlyOwner()
     {
-        nftFractionsRepository = NftFractionsRepository(
+        nftFractionsRepository = INftFractionsRepository(
             nftFractionsRepositoryAddress
         );
     }
@@ -117,8 +120,10 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
     ) external tokenExist(tokenId) {
         require(!paused(), "Not allowed while paused");
         if (side == Side.SELL) {
-            uint256 sendersBalance =
-                nftFractionsRepository.balanceOf(msg.sender, tokenId);
+            uint256 sendersBalance = nftFractionsRepository.balanceOf(
+                msg.sender,
+                tokenId
+            );
             require(
                 sendersBalance >= amount,
                 "message sender's token balance is too low"
@@ -127,7 +132,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
         } else {
             uint256 totalFractionsAmount;
             totalFractionsAmount = nftFractionsRepository
-                .getTotalFractionsAmount(tokenId);
+            .getTotalFractionsAmount(tokenId);
             require(
                 totalFractionsAmount >= amount,
                 "total amount of fractions is lower than the given amount"
@@ -177,17 +182,18 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
     ) external tokenExist(tokenId) {
         require(!paused(), "Not allowed while paused");
         if (side == Side.SELL) {
-            uint256 sendersBalance =
-                nftFractionsRepository.balanceOf(msg.sender, tokenId);
+            uint256 sendersBalance = nftFractionsRepository.balanceOf(
+                msg.sender,
+                tokenId
+            );
             require(
                 sendersBalance >= amount,
                 "message sender's token balance is too low"
             );
         }
-        Order[] storage orders =
-            orderBook[tokenId][
-                uint256(side == Side.BUY ? Side.SELL : Side.BUY)
-            ];
+        Order[] storage orders = orderBook[tokenId][
+            uint256(side == Side.BUY ? Side.SELL : Side.BUY)
+        ];
         uint256 i;
         uint256 remaining = amount;
 
@@ -291,7 +297,7 @@ contract Dex is Initializable, PausableUpgradeable, OwnableUpgradeable {
     modifier tokenExist(uint256 tokenId) {
         address erc721ContractAddress;
         (erc721ContractAddress) = nftFractionsRepository
-            .getErc721ContractAddress(tokenId);
+        .getErc721ContractAddress(tokenId);
         require(
             erc721ContractAddress != address(0),
             "this token does not exist"
