@@ -1,48 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { BufferList } from "bl";
 import NFTCards from './NFTCards.js'
-import { gql, useApolloClient } from '@apollo/client';
+import { gql } from '@apollo/client';
 
-const AllNFTs = ({ accounts, nftFractionsRepositoryContract, ipfs, apolloClient }) => {
+const AllNFTs = ({ accounts, ipfs, apolloClient }) => {
     const [nftList, setNftList] = useState([]);
 
     const GET_TOKENS = `
-    query getTokens {
+    query getTokens($account: String) {
         tokens {
-            id
-            identifier
-            totalSupply
-            tokenURI
+          id
+          identifier
+          totalSupply
+          tokenURI
+          balances (
+              account: $account
+          ) {      
+            value
           }
-    }
+        }
+      }
     `
     useEffect(() => {
         const loadNfts = async () => {
-
-            apolloClient.query({
-                query: gql(GET_TOKENS)
+            const { data } = await apolloClient.query({
+                query: gql(GET_TOKENS),
+                variables: {
+                    account: accounts[0]
+                }
             })
-                .then(async (data) => {
-                    debugger
-                    const nftsFromIpfs = [];
-                    for (let token of data.data.tokens) {
-                        const tokenURI = token.tokenURI;
-                        let nftMetadataFromIPFS = { name: 'name' };
-                        for await (const file of ipfs.get(tokenURI)) {
-                            const content = new BufferList()
-                            for await (const chunk of file.content) {
-                                content.append(chunk)
-                            }
-                            nftMetadataFromIPFS = JSON.parse(content.toString());
-                        }
-                        nftMetadataFromIPFS.tokenId = token.identifier;
-                        //nftMetadataFromIPFS.myShares = myShares;
-                        nftMetadataFromIPFS.sharesAmount = token.totalSupply;
-                        nftsFromIpfs.push(nftMetadataFromIPFS);
+            const nftsFromIpfs = [];
+            for (let token of data.tokens) {
+                const tokenURI = token.tokenURI;
+                let nftMetadataFromIPFS = { name: 'name' };
+                for await (const file of ipfs.get(tokenURI)) {
+                    const content = new BufferList()
+                    for await (const chunk of file.content) {
+                        content.append(chunk)
                     }
-                    setNftList(nftsFromIpfs);
-                })
-                .catch(err => { console.log("Error fetching data from the graph: ", err) });
+                    nftMetadataFromIPFS = JSON.parse(content.toString());
+                }
+                nftMetadataFromIPFS.tokenId = token.identifier;
+                nftMetadataFromIPFS.myShares = token.balances[0].value;
+                nftMetadataFromIPFS.sharesAmount = token.totalSupply;
+                nftsFromIpfs.push(nftMetadataFromIPFS);
+            }
+            setNftList(nftsFromIpfs);
         }
         loadNfts();
         // eslint-disable-next-line

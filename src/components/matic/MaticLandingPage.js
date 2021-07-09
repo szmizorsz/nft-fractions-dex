@@ -175,7 +175,6 @@ const MaticLandingPage = ({ web3, accounts, ipfs }) => {
                 <AllNFTs
                     web3={web3}
                     accounts={accounts}
-                    nftFractionsRepositoryContract={nftFractionsRepositoryContract}
                     ipfs={ipfs}
                     apolloClient={apolloClient} />
             </TabPanel>
