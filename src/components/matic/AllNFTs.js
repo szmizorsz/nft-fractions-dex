@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BufferList } from "bl";
 import NFTCards from './NFTCards.js'
-import { gql } from '@apollo/client';
+import { gql, useApolloClient } from '@apollo/client';
 
-const AllNFTs = ({ accounts, ipfs, apolloClient }) => {
+const AllNFTs = ({ accounts, ipfs }) => {
     const [nftList, setNftList] = useState([]);
+    const apolloClient = useApolloClient();
 
     const GET_TOKENS = `
     query getTokens($account: String) {
@@ -21,6 +22,7 @@ const AllNFTs = ({ accounts, ipfs, apolloClient }) => {
         }
       }
     `
+
     useEffect(() => {
         const loadNfts = async () => {
             const { data } = await apolloClient.query({
