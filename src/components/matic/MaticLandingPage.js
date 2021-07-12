@@ -181,7 +181,6 @@ const MaticLandingPage = ({ web3, accounts, ipfs }) => {
                 <MyNFTs
                     web3={web3}
                     accounts={accounts}
-                    nftFractionsRepositoryContract={nftFractionsRepositoryContract}
                     ipfs={ipfs} />
             </TabPanel>
             <TabPanel value={value} index={2}>

@@ -1,19 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { BufferList } from "bl";
 import NFTCards from './NFTCards.js'
+import { gql, useApolloClient } from '@apollo/client';
 
-const MyNFTs = ({ accounts, nftFractionsRepositoryContract, ipfs }) => {
+const MyNFTs = ({ accounts, ipfs }) => {
     const [nftList, setNftList] = useState([]);
+    const apolloClient = useApolloClient();
+
+    const GET_MY_TOKENS = `
+    query getTokens {
+        accounts (
+          where: {
+            id: "${accounts[0].toLowerCase()}"
+          }			
+        ) {
+          id
+          balances {
+            id
+            value
+            token {
+              id
+              identifier
+              totalSupply
+              tokenURI
+            }
+          }
+        }
+        }  
+    `
 
     useEffect(() => {
         const loadMyNfts = async () => {
+            const { data } = await apolloClient.query({
+                query: gql(GET_MY_TOKENS)
+            })
             const nftsFromIpfs = [];
-            const tokenIds = await nftFractionsRepositoryContract.methods.getTokenIdsByShareOwner(accounts[0]).call();
-            for (let tokenId of tokenIds) {
-                const tokenData = await nftFractionsRepositoryContract.methods.getTokenData(tokenId).call();
-                const myShares = await nftFractionsRepositoryContract.methods.balanceOf(accounts[0], tokenId).call()
-                const tokenURI = tokenData.tokenURI;
-                let nftMetadataFromIPFS;
+            for (let balance of data.accounts[0].balances) {
+                let token = balance.token;
+                const tokenURI = token.tokenURI;
+                let nftMetadataFromIPFS = { name: 'name' };
                 for await (const file of ipfs.get(tokenURI)) {
                     const content = new BufferList()
                     for await (const chunk of file.content) {
@@ -21,9 +46,9 @@ const MyNFTs = ({ accounts, nftFractionsRepositoryContract, ipfs }) => {
                     }
                     nftMetadataFromIPFS = JSON.parse(content.toString());
                 }
-                nftMetadataFromIPFS.tokenId = tokenId;
-                nftMetadataFromIPFS.sharesAmount = tokenData.totalFractionsAmount;
-                nftMetadataFromIPFS.myShares = myShares;
+                nftMetadataFromIPFS.tokenId = token.identifier;
+                nftMetadataFromIPFS.myShares = balance.value;
+                nftMetadataFromIPFS.sharesAmount = token.totalSupply;
                 nftsFromIpfs.push(nftMetadataFromIPFS);
             }
             setNftList(nftsFromIpfs);
