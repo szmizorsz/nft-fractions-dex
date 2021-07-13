@@ -25,10 +25,11 @@ import { Button } from '@material-ui/core/';
 import PlaceBuyOrder from './PlaceBuyOrder.js';
 import PlaceSellOrder from './PlaceSellOrder.js';
 import TokenTransferApprovalDialog from './TokenTransferApprovalDialog.js';
-import NftFractionsRepository from '../../contracts/matic/NftFractionsRepository.json';
+import NftFractionsRepository from '../../contracts/matic/MaticNftFractionsRepository.json';
 import Dex from '../../contracts/matic/Dex.json';
 import MaticBridge from '../../contracts/matic/MaticBridge.json';
 import TokenTransferAcrossChainsDialog from './TokenTransferAcrossChainsDialog.js';
+import { gql, useApolloClient } from '@apollo/client';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -46,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
 const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
     const { params: { tokenId } } = match;
     const classes = useStyles();
+    const apolloClient = useApolloClient();
 
     const [nftFractionsRepositoryContract, setNftFractionsRepositoryContract] = useState(undefined);
     const [dexContract, setDexContract] = useState(undefined);
@@ -68,6 +70,30 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
     const [tokenTransferDialogOpen, setTokenTransferDialogOpen] = useState(false);
     const [selectedNetwork, setSelectedNetwork] = useState(0);
     const [tokenTransferAccrossChainsDialogOpen, setTokenTransferAccrossChainsDialogOpen] = useState(false);
+
+    const GET_TOKEN = `
+    query getToken{
+        tokens (
+          where: {
+            identifier: "${tokenId}"
+          }
+        ) {
+          id
+          identifier
+          totalSupply
+          tokenURI
+          erc721ContractAddress
+          erc721TokenId
+          balances {
+            id
+            value
+            account {
+                id
+            }
+          }
+        }
+        }
+    `
 
     useEffect(() => {
         const init = async () => {
@@ -92,8 +118,11 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
             setDexContract(dexContract);
             setMaticBridgeContract(maticBridgeContract);
 
-            const tokenData = await nftFractionsRepositoryContract.methods.getTokenData(tokenId).call();
-            const tokenURI = tokenData.tokenURI;
+            const { data } = await apolloClient.query({
+                query: gql(GET_TOKEN)
+            })
+            const token = data.tokens[0];
+            const tokenURI = token.tokenURI;
             let nftMetadataFromIPFS = { name: 'name' };
             for await (const file of ipfs.get(tokenURI)) {
                 const content = new BufferList()
@@ -104,25 +133,28 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
             }
             nftMetadataFromIPFS.tokenId = tokenId;
             setMetadata(nftMetadataFromIPFS);
-            setTotalShares(tokenData.totalFractionsAmount);
-            const mySharesFromChain = await nftFractionsRepositoryContract.methods.balanceOf(accounts[0], tokenId).call();
-            setMyShares(mySharesFromChain);
-            setOriginalContract(tokenData.erc721ContractAddress);
-            setOriginalTokenId(tokenData.erc721TokenId);
-            const ownersFromChain = await nftFractionsRepositoryContract.methods.getOwnersBYtokenId(tokenId).call();
+
+            setTotalShares(token.totalSupply);
+            setOriginalContract(token.erc721ContractAddress);
+            setOriginalTokenId(token.erc721TokenId);
+
             let ownersData = [];
             let acctualAccountsShares;
-            for (let owner of ownersFromChain) {
-                const ownerShares = await nftFractionsRepositoryContract.methods.balanceOf(owner, tokenId).call();
+            for (let balance of token.balances) {
+                debugger
+                let owner = balance.account.id;
+                let ownerShares = balance.value;
                 let ownerData = {
                     "owner": owner,
                     "shares": ownerShares
                 }
                 ownersData.push(ownerData);
-                if (owner === accounts[0]) {
+                if (owner === accounts[0].toLowerCase()) {
                     acctualAccountsShares = ownerShares;
                 }
             }
+            setMyShares(acctualAccountsShares);
+
             let sharesReservedInOrders = await dexContract.methods.getSharesReserveBalance(accounts[0], tokenId).call();
             setSharesAvailableForSelling(acctualAccountsShares - sharesReservedInOrders);
             setOwners(ownersData);

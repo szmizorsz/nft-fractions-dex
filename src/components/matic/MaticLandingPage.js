@@ -12,8 +12,6 @@ import Grid from '@material-ui/core/Grid';
 import MaticBalance from './MaticBalance.js'
 import MaticNftFractionsRepository from '../../contracts/matic/MaticNftFractionsRepository.json';
 import Dex from '../../contracts/matic/Dex.json';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-import { GRAPH_API_URL } from '../../config/settings.js'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -91,7 +89,6 @@ const MaticLandingPage = ({ web3, accounts, ipfs }) => {
     const [nftFractionsRepositoryContract, setNftFractionsRepositoryContract] = useState(undefined);
     const [dexContract, setDexContract] = useState(undefined);
     const [selectedNetwork, setSelectedNetwork] = useState(0);
-    const [apolloClient, setApolloClient] = useState(undefined);
 
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
@@ -115,11 +112,6 @@ const MaticLandingPage = ({ web3, accounts, ipfs }) => {
             );
             setNftFractionsRepositoryContract(nftFractionsRepositoryContract);
             setDexContract(dexContract);
-            const client = new ApolloClient({
-                uri: GRAPH_API_URL,
-                cache: new InMemoryCache()
-            });
-            setApolloClient(client);
         }
         init();
         window.ethereum.on('chainChanged', chainId => {
@@ -135,7 +127,6 @@ const MaticLandingPage = ({ web3, accounts, ipfs }) => {
             && typeof dexContract !== 'undefined'
             && typeof web3 !== 'undefined'
             && typeof accounts !== 'undefined'
-            && typeof apolloClient !== 'undefined'
             && selectedNetwork === 80001
         );
     }
@@ -145,7 +136,7 @@ const MaticLandingPage = ({ web3, accounts, ipfs }) => {
     }
 
     return (
-        <ApolloProvider client={apolloClient}>
+        <>
             <Grid container>
                 <Grid item md={10}>
                     <div className={classes.root}>
@@ -194,7 +185,7 @@ const MaticLandingPage = ({ web3, accounts, ipfs }) => {
                 nftFractionsRepositoryContract={nftFractionsRepositoryContract}
                 nftDepositDialogOpen={nftDepositDialogOpen}
                 setNftDepositDialogOpen={setNftDepositDialogOpen} />
-        </ApolloProvider>
+        </>
     )
 }
 
