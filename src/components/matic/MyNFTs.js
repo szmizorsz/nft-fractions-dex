@@ -15,7 +15,11 @@ const MyNFTs = ({ accounts, ipfs }) => {
           }			
         ) {
           id
-          balances {
+          balances (
+          where: {
+            value_gt: 0
+          	}			
+       	  ) {
             id
             value
             token {
@@ -26,7 +30,7 @@ const MyNFTs = ({ accounts, ipfs }) => {
             }
           }
         }
-        }  
+        } 
     `
 
     useEffect(() => {

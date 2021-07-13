@@ -9,7 +9,11 @@ const AllNFTs = ({ accounts, ipfs }) => {
 
     const GET_TOKENS = `
     query getTokens($account: String) {
-        tokens {
+        tokens(
+            where: {
+              deposited: true
+            }			
+        ) {
           id
           identifier
           totalSupply
