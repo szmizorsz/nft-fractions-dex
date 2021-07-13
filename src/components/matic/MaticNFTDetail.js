@@ -72,10 +72,10 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
     const [tokenTransferAccrossChainsDialogOpen, setTokenTransferAccrossChainsDialogOpen] = useState(false);
 
     const GET_TOKEN = `
-    query getToken{
+    query getToken($identifier: BigInt){
         tokens (
           where: {
-            identifier: "${tokenId}"
+            identifier: $identifier
           }
         ) {
           id
@@ -119,7 +119,10 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
             setMaticBridgeContract(maticBridgeContract);
 
             const { data } = await apolloClient.query({
-                query: gql(GET_TOKEN)
+                query: gql(GET_TOKEN),
+                variables: {
+                    identifier: tokenId
+                }
             })
             const token = data.tokens[0];
             const tokenURI = token.tokenURI;
@@ -139,18 +142,20 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
             setOriginalTokenId(token.erc721TokenId);
 
             let ownersData = [];
-            let acctualAccountsShares;
-            for (let balance of token.balances) {
-                debugger
-                let owner = balance.account.id;
-                let ownerShares = balance.value;
-                let ownerData = {
-                    "owner": owner,
-                    "shares": ownerShares
-                }
-                ownersData.push(ownerData);
-                if (owner === accounts[0].toLowerCase()) {
-                    acctualAccountsShares = ownerShares;
+            let acctualAccountsShares = 0;
+            if (token.balances.length > 0) {
+                for (let balance of token.balances) {
+                    debugger
+                    let owner = balance.account.id;
+                    let ownerShares = balance.value;
+                    let ownerData = {
+                        "owner": owner,
+                        "shares": ownerShares
+                    }
+                    ownersData.push(ownerData);
+                    if (owner === accounts[0].toLowerCase()) {
+                        acctualAccountsShares = ownerShares;
+                    }
                 }
             }
             setMyShares(acctualAccountsShares);
