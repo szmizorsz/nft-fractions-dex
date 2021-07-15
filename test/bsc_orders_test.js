@@ -12,13 +12,13 @@ contract("Dex orders", async function (accounts) {
     let erc721TokenId = 1;
     let fractionsAmount = 100;
     let erc1155TokenId = 1;
+    let tokenURI = "tokenURI";
 
     beforeEach(async function () {
         erc721MockInstance = await ERC721Mock.new();
         await erc721MockInstance.mint(nftOwner, erc721TokenId);
         nftFractionsRepositoryInstance = await deployProxy(NftFractionsRepository, ["URI"]);
-        await erc721MockInstance.approve(nftFractionsRepositoryInstance.address, erc721TokenId, { from: nftOwner });
-        await nftFractionsRepositoryInstance.depositNft(erc721MockInstance.address, erc721TokenId, fractionsAmount, { from: nftOwner });
+        await nftFractionsRepositoryInstance.mint(erc721MockInstance.address, erc721TokenId, erc1155TokenId, fractionsAmount, fractionsAmount, nftOwner, tokenURI);
         dexInstance = await deployProxy(Dex, []);
         dexInstance.setNftFractionsRepository(nftFractionsRepositoryInstance.address);
         await nftFractionsRepositoryInstance.setApprovalForAll(dexInstance.address, true, { from: nftOwner });

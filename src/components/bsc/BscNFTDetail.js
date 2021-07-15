@@ -190,7 +190,7 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
                                     aria-controls="panel1a-content"
                                     id="panel1a-header"
                                 >
-                                    <Typography className={classes.heading}>Owners</Typography>
+                                    <Typography className={classes.heading}>Owners (on Bsc)</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <TokenOwners owners={owners} />
