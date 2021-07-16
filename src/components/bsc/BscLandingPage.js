@@ -8,7 +8,7 @@ import MyNFTs from './MyNFTs.js'
 import AllNFTs from './AllNFTs.js'
 import Grid from '@material-ui/core/Grid';
 import BnbBalance from './BnbBalance.js'
-import NftFractionsRepository from '../../contracts/bsc/NftFractionsRepository.json';
+import BscNftFractionsRepository from '../../contracts/bsc/BscNftFractionsRepository.json';
 import Dex from '../../contracts/bsc/Dex.json';
 
 function TabPanel(props) {
@@ -97,9 +97,9 @@ const BscLandingPage = ({ web3, accounts, ipfs }) => {
         const init = async () => {
             const networkId = await web3.eth.net.getId();
             setSelectedNetwork(networkId);
-            let deployedNetwork = NftFractionsRepository.networks[networkId];
+            let deployedNetwork = BscNftFractionsRepository.networks[networkId];
             const nftFractionsRepositoryContract = new web3.eth.Contract(
-                NftFractionsRepository.abi,
+                BscNftFractionsRepository.abi,
                 deployedNetwork && deployedNetwork.address,
             );
             deployedNetwork = Dex.networks[networkId];

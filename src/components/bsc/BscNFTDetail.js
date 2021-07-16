@@ -25,7 +25,7 @@ import { Button } from '@material-ui/core/';
 import PlaceBuyOrder from './PlaceBuyOrder.js';
 import PlaceSellOrder from './PlaceSellOrder.js';
 import TokenTransferApprovalDialog from './TokenTransferApprovalDialog.js';
-import NftFractionsRepository from '../../contracts/bsc/NftFractionsRepository.json';
+import BscNftFractionsRepository from '../../contracts/bsc/BscNftFractionsRepository.json';
 import Dex from '../../contracts/bsc/Dex.json';
 import BscBridge from '../../contracts/bsc/BscBridge.json';
 import TokenTransferAcrossChainsDialog from './TokenTransferAcrossChainsDialog.js';
@@ -73,9 +73,9 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
         const init = async () => {
             const networkId = await web3.eth.net.getId();
             setSelectedNetwork(networkId);
-            let deployedNetwork = NftFractionsRepository.networks[networkId];
+            let deployedNetwork = BscNftFractionsRepository.networks[networkId];
             const nftFractionsRepositoryContract = new web3.eth.Contract(
-                NftFractionsRepository.abi,
+                BscNftFractionsRepository.abi,
                 deployedNetwork && deployedNetwork.address,
             );
             deployedNetwork = Dex.networks[networkId];

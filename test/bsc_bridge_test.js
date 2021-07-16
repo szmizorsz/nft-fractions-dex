@@ -1,10 +1,10 @@
 const ERC721Mock = artifacts.require("ERC721Mock");
-const NftFractionsRepository = artifacts.require("NftFractionsRepository");
+const BscNftFractionsRepository = artifacts.require("BscNftFractionsRepository");
 const MaticBridge = artifacts.require("MaticBridge");
 const truffleAssert = require("truffle-assertions");
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
-contract("Bridge tests", async function (accounts) {
+contract("Bsc bridge tests", async function (accounts) {
     let nftFractionsRepositoryInstance;
     let erc721MockInstance;
     let bridgeInstance;
@@ -20,7 +20,7 @@ contract("Bridge tests", async function (accounts) {
         await erc721MockInstance.mint(nftOwner, erc721TokenId);
         await erc721MockInstance.setTokenURI(erc721TokenId, tokenURI);
 
-        nftFractionsRepositoryInstance = await deployProxy(NftFractionsRepository, ["URI"]);
+        nftFractionsRepositoryInstance = await deployProxy(BscNftFractionsRepository, ["URI"]);
         await nftFractionsRepositoryInstance.mint(erc721MockInstance.address, erc721TokenId, erc1155TokenId, fractionsAmount, fractionsAmount, nftOwner, tokenURI);
 
         bridgeInstance = await MaticBridge.new();

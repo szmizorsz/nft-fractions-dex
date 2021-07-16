@@ -1,4 +1,4 @@
-const NftFractionsRepository = artifacts.require("NftFractionsRepository");
+const BscNftFractionsRepository = artifacts.require("BscNftFractionsRepository");
 const Dex = artifacts.require("Dex");
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 const truffleAssert = require("truffle-assertions");
@@ -9,7 +9,7 @@ contract("Dex eth deposits and withdrawals", async function (accounts) {
     let ethOwner = accounts[8];
 
     beforeEach(async function () {
-        nftFractionsRepositoryInstance = await deployProxy(NftFractionsRepository, ["URI"]);
+        nftFractionsRepositoryInstance = await deployProxy(BscNftFractionsRepository, ["URI"]);
         dexInstance = await deployProxy(Dex, []);
         dexInstance.setNftFractionsRepository(nftFractionsRepositoryInstance.address);
     });

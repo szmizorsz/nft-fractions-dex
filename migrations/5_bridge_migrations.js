@@ -1,4 +1,4 @@
-const NftFractionsRepository = artifacts.require('NftFractionsRepository');
+const BscNftFractionsRepository = artifacts.require('BscNftFractionsRepository');
 const MaticNftFractionsRepository = artifacts.require('MaticNftFractionsRepository');
 const MaticBridge = artifacts.require('MaticBridge');
 const BscBridge = artifacts.require('BscBridge');
@@ -10,9 +10,9 @@ module.exports = async function (deployer, network) {
         await maticBridge.setNftFractionsRepository(maticNftFractionsRepositoryInstance.address);
         await maticNftFractionsRepositoryInstance.transferOwnership(maticBridge.address);
     } else if (network === 'bscTestnet') {
-        const nftFractionsRepositoryInstance = await NftFractionsRepository.deployed();
+        const bscNftFractionsRepositoryInstance = await BscNftFractionsRepository.deployed();
         const bscBridge = await deployer.deploy(BscBridge);
-        await bscBridge.setNftFractionsRepository(nftFractionsRepositoryInstance.address);
-        await nftFractionsRepositoryInstance.transferOwnership(bscBridge.address);
+        await bscBridge.setNftFractionsRepository(bscNftFractionsRepositoryInstance.address);
+        await bscNftFractionsRepositoryInstance.transferOwnership(bscBridge.address);
     }
 };

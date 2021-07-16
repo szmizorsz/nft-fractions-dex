@@ -1,5 +1,5 @@
 const ERC721Mock = artifacts.require("ERC721Mock");
-const NftFractionsRepository = artifacts.require("NftFractionsRepository");
+const BscNftFractionsRepository = artifacts.require("BscNftFractionsRepository");
 const Dex = artifacts.require("Dex");
 const truffleAssert = require("truffle-assertions");
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
@@ -17,7 +17,7 @@ contract("Dex orders", async function (accounts) {
     beforeEach(async function () {
         erc721MockInstance = await ERC721Mock.new();
         await erc721MockInstance.mint(nftOwner, erc721TokenId);
-        nftFractionsRepositoryInstance = await deployProxy(NftFractionsRepository, ["URI"]);
+        nftFractionsRepositoryInstance = await deployProxy(BscNftFractionsRepository, ["URI"]);
         await nftFractionsRepositoryInstance.mint(erc721MockInstance.address, erc721TokenId, erc1155TokenId, fractionsAmount, fractionsAmount, nftOwner, tokenURI);
         dexInstance = await deployProxy(Dex, []);
         dexInstance.setNftFractionsRepository(nftFractionsRepositoryInstance.address);

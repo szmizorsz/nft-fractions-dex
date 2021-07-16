@@ -1,6 +1,6 @@
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
-const NftFractionsRepository = artifacts.require('NftFractionsRepository');
+const BscNftFractionsRepository = artifacts.require('BscNftFractionsRepository');
 const MaticNftFractionsRepository = artifacts.require('MaticNftFractionsRepository');
 
 module.exports = async function (deployer, network) {
@@ -9,11 +9,11 @@ module.exports = async function (deployer, network) {
             await deployProxy(MaticNftFractionsRepository, ["URI"], { deployer });
             break;
         case "bscTestnet":
-            await deployProxy(NftFractionsRepository, ["URI"], { deployer });
+            await deployProxy(BscNftFractionsRepository, ["URI"], { deployer });
             break;
         case "development":
             await deployProxy(MaticNftFractionsRepository, ["URI"], { deployer });
-            await deployProxy(NftFractionsRepository, ["URI"], { deployer });
+            await deployProxy(BscNftFractionsRepository, ["URI"], { deployer });
             break;
     }
 };

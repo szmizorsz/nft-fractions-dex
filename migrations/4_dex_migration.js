@@ -1,11 +1,11 @@
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
 const Dex = artifacts.require('Dex');
-const NftFractionsRepository = artifacts.require('NftFractionsRepository');
+const BscNftFractionsRepository = artifacts.require('BscNftFractionsRepository');
 const MaticNftFractionsRepository = artifacts.require('MaticNftFractionsRepository');
 
 module.exports = async function (deployer, network) {
-    let nftFractionsRepositoryInstance;
+    let bscNftFractionsRepositoryInstance;
     let maticNftFractionsRepositoryInstance;
     const instance = await deployProxy(Dex, [], { deployer });
     switch (network) {
@@ -14,12 +14,12 @@ module.exports = async function (deployer, network) {
             await instance.setNftFractionsRepository(maticNftFractionsRepositoryInstance.address);
             break;
         case "bscTestnet":
-            nftFractionsRepositoryInstance = await NftFractionsRepository.deployed();
-            await instance.setNftFractionsRepository(nftFractionsRepositoryInstance.address);
+            bscNftFractionsRepositoryInstance = await BscNftFractionsRepository.deployed();
+            await instance.setNftFractionsRepository(bscNftFractionsRepositoryInstance.address);
             break;
         case "development":
-            nftFractionsRepositoryInstance = await NftFractionsRepository.deployed();
-            await instance.setNftFractionsRepository(nftFractionsRepositoryInstance.address);
+            bscNftFractionsRepositoryInstance = await BscNftFractionsRepository.deployed();
+            await instance.setNftFractionsRepository(bscNftFractionsRepositoryInstance.address);
             break;
     }
 };

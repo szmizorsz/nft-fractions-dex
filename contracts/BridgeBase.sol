@@ -4,14 +4,17 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./NftFractionsRepository.sol";
+import "./NftFractionsRepositoryBase.sol";
 
 contract BridgeBase is Ownable, Pausable {
     uint256 public nonce;
     mapping(uint256 => bool) public processedNonces;
-    NftFractionsRepository nftFractionsRepository;
+    NftFractionsRepositoryBase nftFractionsRepository;
 
-    enum Step {Burn, Mint}
+    enum Step {
+        Burn,
+        Mint
+    }
 
     event Transfer(
         address from,
@@ -31,7 +34,7 @@ contract BridgeBase is Ownable, Pausable {
         public
         onlyOwner()
     {
-        nftFractionsRepository = NftFractionsRepository(
+        nftFractionsRepository = NftFractionsRepositoryBase(
             nftFractionsRepositoryAddress
         );
     }
@@ -51,8 +54,10 @@ contract BridgeBase is Ownable, Pausable {
         uint256 erc1155Amount
     ) external {
         require(!paused(), "Not allowed while paused");
-        uint256 transfererBalance =
-            nftFractionsRepository.balanceOf(msg.sender, erc1155TokenId);
+        uint256 transfererBalance = nftFractionsRepository.balanceOf(
+            msg.sender,
+            erc1155TokenId
+        );
         require(
             transfererBalance >= erc1155Amount,
             "message sender's token balance is too low"

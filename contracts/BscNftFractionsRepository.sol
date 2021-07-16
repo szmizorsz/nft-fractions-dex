@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./NftFractionsRepositoryBase.sol";
 
-contract NftFractionsRepository is
+contract BscNftFractionsRepository is
     Initializable,
     ERC1155Upgradeable,
     PausableUpgradeable,
