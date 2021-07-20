@@ -99,7 +99,7 @@ contract NftFractionsRepositoryBase is
     }
 
     /**
-     * @dev same as safeTransferFrom with one restriction:
+     * @dev same as safeTransferFrom in ERC1155 with one restriction:
      * - the contract is not paused
      *
      * There is a hook (_afterTransfer) that can be overriden to implement some custom logic performed after the transferFrom

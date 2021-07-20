@@ -1,10 +1,10 @@
 const ERC721Mock = artifacts.require("ERC721Mock");
 const BscNftFractionsRepository = artifacts.require("BscNftFractionsRepository");
-const Dex = artifacts.require("Dex");
+const BscDex = artifacts.require("BscDex");
 const truffleAssert = require("truffle-assertions");
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
-contract("Dex orders", async function (accounts) {
+contract("BscDex orders", async function (accounts) {
     let nftFractionsRepositoryInstance;
     let erc721MockInstance;
     let dexInstance;
@@ -19,7 +19,7 @@ contract("Dex orders", async function (accounts) {
         await erc721MockInstance.mint(nftOwner, erc721TokenId);
         nftFractionsRepositoryInstance = await deployProxy(BscNftFractionsRepository, ["URI"]);
         await nftFractionsRepositoryInstance.mint(erc721MockInstance.address, erc721TokenId, erc1155TokenId, fractionsAmount, fractionsAmount, nftOwner, tokenURI);
-        dexInstance = await deployProxy(Dex, []);
+        dexInstance = await deployProxy(BscDex, []);
         dexInstance.setNftFractionsRepository(nftFractionsRepositoryInstance.address);
         await nftFractionsRepositoryInstance.setApprovalForAll(dexInstance.address, true, { from: nftOwner });
     });
@@ -145,16 +145,6 @@ contract("Dex orders", async function (accounts) {
         let sellAmount = 40;
         let result = await dexInstance.createMarketOrder(erc1155TokenId, sellAmount, sellSide, { from: nftOwner });
 
-        truffleAssert.eventEmitted(result, 'NewTrade');
-        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
-            return e.orderId.toNumber() === 1
-                && e.tokenId.toNumber() === erc1155TokenId
-                && e.trader1 === buyer
-                && e.trader2 === nftOwner
-                && e.amount.toNumber() === sellAmount
-                && e.price.toNumber() === price;
-        }, 'event params incorrect');
-
         let orders = await dexInstance.getOrders(erc1155TokenId, buySide);
         assert(orders.length == 1);
         assert(orders[0].id == 1);
@@ -194,24 +184,6 @@ contract("Dex orders", async function (accounts) {
         let sellAmount = 80;
         let result = await dexInstance.createMarketOrder(erc1155TokenId, sellAmount, sellSide, { from: nftOwner });
 
-        truffleAssert.eventEmitted(result, 'NewTrade');
-        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
-            return e.orderId.toNumber() === 1
-                && e.tokenId.toNumber() === erc1155TokenId
-                && e.trader1 === buyer
-                && e.trader2 === nftOwner
-                && e.amount.toNumber() === amount1
-                && e.price.toNumber() === price1;
-        }, 'event params incorrect');
-        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
-            return e.orderId.toNumber() === 2
-                && e.tokenId.toNumber() === erc1155TokenId
-                && e.trader1 === buyer
-                && e.trader2 === nftOwner
-                && e.amount.toNumber() === 30
-                && e.price.toNumber() === price2;
-        }, 'event params incorrect');
-
         let orders = await dexInstance.getOrders(erc1155TokenId, buySide);
         assert(orders.length == 1);
         assert(orders[0].id == 2);
@@ -238,16 +210,6 @@ contract("Dex orders", async function (accounts) {
         let buySide = 0;
         let buyAmount = 40;
         let result = await dexInstance.createMarketOrder(erc1155TokenId, buyAmount, buySide, { from: buyer });
-
-        truffleAssert.eventEmitted(result, 'NewTrade');
-        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
-            return e.orderId.toNumber() === 1
-                && e.tokenId.toNumber() === erc1155TokenId
-                && e.trader1 === nftOwner
-                && e.trader2 === buyer
-                && e.amount.toNumber() === buyAmount
-                && e.price.toNumber() === price;
-        }, 'event params incorrect');
 
         let orders = await dexInstance.getOrders(erc1155TokenId, sellSide);
         assert(orders.length == 1);
@@ -276,16 +238,6 @@ contract("Dex orders", async function (accounts) {
         let buyAmount = 60;
         let result = await dexInstance.createMarketOrder(erc1155TokenId, buyAmount, buySide, { from: buyer });
 
-        truffleAssert.eventEmitted(result, 'NewTrade');
-        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
-            return e.orderId.toNumber() === 1
-                && e.tokenId.toNumber() === erc1155TokenId
-                && e.trader1 === nftOwner
-                && e.trader2 === buyer
-                && e.amount.toNumber() === amount
-                && e.price.toNumber() === price;
-        }, 'event params incorrect');
-
         let orders = await dexInstance.getOrders(erc1155TokenId, sellSide);
         assert(orders.length == 0);
         orders = await dexInstance.getOrders(erc1155TokenId, buySide);
@@ -307,24 +259,6 @@ contract("Dex orders", async function (accounts) {
         let buySide = 0;
         let buyAmount = 90;
         let result = await dexInstance.createMarketOrder(erc1155TokenId, buyAmount, buySide, { from: buyer });
-
-        truffleAssert.eventEmitted(result, 'NewTrade');
-        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
-            return e.orderId.toNumber() === 1
-                && e.tokenId.toNumber() === erc1155TokenId
-                && e.trader1 === nftOwner
-                && e.trader2 === buyer
-                && e.amount.toNumber() === amount
-                && e.price.toNumber() === price;
-        }, 'event params incorrect');
-        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
-            return e.orderId.toNumber() === 2
-                && e.tokenId.toNumber() === erc1155TokenId
-                && e.trader1 === nftOwner
-                && e.trader2 === buyer
-                && e.amount.toNumber() === 40
-                && e.price.toNumber() === price2;
-        }, 'event params incorrect');
 
         let orders = await dexInstance.getOrders(erc1155TokenId, sellSide);
         assert(orders.length == 1);
@@ -353,16 +287,6 @@ contract("Dex orders", async function (accounts) {
         let buySide = 0;
         let buyAmount = 100;
         let result = await dexInstance.createMarketOrder(erc1155TokenId, buyAmount, buySide, { from: buyer });
-
-        truffleAssert.eventEmitted(result, 'NewTrade');
-        truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
-            return e.orderId.toNumber() === 1
-                && e.tokenId.toNumber() === erc1155TokenId
-                && e.trader1 === nftOwner
-                && e.trader2 === buyer
-                && e.amount.toNumber() === amount
-                && e.price.toNumber() === price;
-        }, 'event params incorrect');
 
         let orders = await dexInstance.getOrders(erc1155TokenId, sellSide);
         assert(orders.length == 0);

@@ -1,25 +1,33 @@
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
-const Dex = artifacts.require('Dex');
+const MaticDex = artifacts.require('MaticDex');
+const BscDex = artifacts.require('BscDex');
 const BscNftFractionsRepository = artifacts.require('BscNftFractionsRepository');
 const MaticNftFractionsRepository = artifacts.require('MaticNftFractionsRepository');
 
 module.exports = async function (deployer, network) {
     let bscNftFractionsRepositoryInstance;
     let maticNftFractionsRepositoryInstance;
-    const instance = await deployProxy(Dex, [], { deployer });
+    let bscDex;
+    let maticDex;
     switch (network) {
         case "maticMumbai":
+            maticDex = await deployProxy(MaticDex, [], { deployer });
             maticNftFractionsRepositoryInstance = await MaticNftFractionsRepository.deployed();
-            await instance.setNftFractionsRepository(maticNftFractionsRepositoryInstance.address);
+            await maticDex.setNftFractionsRepository(maticNftFractionsRepositoryInstance.address);
             break;
         case "bscTestnet":
+            bscDex = await deployProxy(BscDex, [], { deployer });
             bscNftFractionsRepositoryInstance = await BscNftFractionsRepository.deployed();
-            await instance.setNftFractionsRepository(bscNftFractionsRepositoryInstance.address);
+            await bscDex.setNftFractionsRepository(bscNftFractionsRepositoryInstance.address);
             break;
         case "development":
+            maticDex = await deployProxy(MaticDex, [], { deployer });
+            maticNftFractionsRepositoryInstance = await MaticNftFractionsRepository.deployed();
+            await maticDex.setNftFractionsRepository(maticNftFractionsRepositoryInstance.address);
+            bscDex = await deployProxy(BscDex, [], { deployer });
             bscNftFractionsRepositoryInstance = await BscNftFractionsRepository.deployed();
-            await instance.setNftFractionsRepository(bscNftFractionsRepositoryInstance.address);
+            await bscDex.setNftFractionsRepository(bscNftFractionsRepositoryInstance.address);
             break;
     }
 };
