@@ -1,6 +1,76 @@
 import { gql } from '@apollo/client';
 import Web3 from "web3";
 
+const GET_ALL_TOKENS = `
+query getTokens($account: String) {
+    tokens(
+        where: {
+          deposited: true
+        }			
+    ) {
+      id
+      identifier
+      totalSupply
+      tokenURI
+      balances (
+        where: {
+            account: $account
+          }
+      ) {      
+        value
+      }
+    }
+  }
+`
+export async function getAllTokensFromGraph(apolloClient, account) {
+    const { data } = await apolloClient.query({
+        query: gql(GET_ALL_TOKENS),
+        variables: {
+            account: account
+        }
+    })
+    return data.tokens;
+}
+
+const GET_ACCOUNT = `
+query getTokens($account: ID)  {
+    accounts (
+      where: {
+        id: $account
+      }			
+    ) {
+      id
+      balances (
+      where: {
+        value_gt: 0
+          }			
+         ) {
+        id
+        value
+        token {
+          id
+          identifier
+          totalSupply
+          tokenURI
+        }
+      }
+    }
+    } 
+`
+export async function getAccountFromGraph(apolloClient, account) {
+    const { data } = await apolloClient.query({
+        query: gql(GET_ACCOUNT),
+        variables: {
+            account: account
+        }
+    })
+    let accountFromGraph = null;
+    if (data.accounts.length > 0) {
+        accountFromGraph = data.accounts[0];
+    }
+    return accountFromGraph;
+}
+
 const GET_BALANCE = `
 query getBalance($account: ID, $tokenId: String) {
     accounts(

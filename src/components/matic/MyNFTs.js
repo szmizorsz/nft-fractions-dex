@@ -1,49 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { BufferList } from "bl";
 import NFTCards from './NFTCards.js'
-import { gql, useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client';
+import {
+    getAccountFromGraph
+} from '../../util/graphDataReader.js';
 
 const MyNFTs = ({ accounts, ipfs }) => {
     const [nftList, setNftList] = useState([]);
     const apolloClient = useApolloClient();
 
-    const GET_MY_TOKENS = `
-    query getTokens($account: ID)  {
-        accounts (
-          where: {
-            id: $account
-          }			
-        ) {
-          id
-          balances (
-          where: {
-            value_gt: 0
-          	}			
-       	  ) {
-            id
-            value
-            token {
-              id
-              identifier
-              totalSupply
-              tokenURI
-            }
-          }
-        }
-        } 
-    `
-
     useEffect(() => {
         const loadMyNfts = async () => {
-            const { data } = await apolloClient.query({
-                query: gql(GET_MY_TOKENS),
-                variables: {
-                    account: accounts[0].toLowerCase()
-                }
-            })
+            const account = await getAccountFromGraph(apolloClient, accounts[0].toLowerCase());
             const nftsFromIpfs = [];
-            if (data.accounts.length > 0 && data.accounts[0].balances.length > 0) {
-                for (let balance of data.accounts[0].balances) {
+            if (account != null && account.balances.length > 0) {
+                for (let balance of account.balances) {
                     let token = balance.token;
                     const tokenURI = token.tokenURI;
                     let nftMetadataFromIPFS = { name: 'name' };
