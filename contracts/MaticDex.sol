@@ -22,6 +22,7 @@ contract MaticDex is DexBase {
     event OrderRemoval(uint256 orderId);
 
     event NewTrade(
+        uint256 tradeId,
         uint256 orderId,
         uint256 tokenId,
         address trader1,
@@ -74,6 +75,7 @@ contract MaticDex is DexBase {
     }
 
     function _onTradeExecution(
+        uint256 tradeId,
         uint256 orderId,
         uint256 tokenId,
         address trader1,
@@ -83,6 +85,7 @@ contract MaticDex is DexBase {
         uint256 timestamp
     ) internal override {
         emit NewTrade(
+            tradeId,
             orderId,
             tokenId,
             trader1,

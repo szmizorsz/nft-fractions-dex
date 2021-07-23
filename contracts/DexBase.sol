@@ -28,6 +28,7 @@ contract DexBase is Initializable, PausableUpgradeable, OwnableUpgradeable {
     }
 
     CountersUpgradeable.Counter private _orderIds;
+    CountersUpgradeable.Counter private _tradeIds;
     mapping(address => uint256) ethBalance;
     mapping(address => uint256) ethReservedBalance;
     mapping(uint256 => mapping(uint256 => Order[])) orderBook;
@@ -208,7 +209,10 @@ contract DexBase is Initializable, PausableUpgradeable, OwnableUpgradeable {
             uint256 matched = (remaining > available) ? available : remaining;
             remaining = remaining - matched;
             orders[i].filled = orders[i].filled + matched;
+            _tradeIds.increment();
+            uint256 newTradeId = _tradeIds.current();
             _onTradeExecution(
+                newTradeId,
                 orders[i].id,
                 tokenId,
                 orders[i].trader,
@@ -355,6 +359,7 @@ contract DexBase is Initializable, PausableUpgradeable, OwnableUpgradeable {
      * @dev hook function that is called when a traded happened
      */
     function _onTradeExecution(
+        uint256 tradeId,
         uint256 orderId,
         uint256 tokenId,
         address trader1,

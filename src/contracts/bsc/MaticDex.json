@@ -318,8 +318,7 @@
       "name": "depositEth",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function",
-      "payable": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -332,8 +331,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -353,8 +351,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -15274,247 +15271,9 @@
     "name": "solc",
     "version": "0.8.0+commit.c7dfd78e.Emscripten.clang"
   },
-  "networks": {
-    "80001": {
-      "events": {
-        "0x702c3ef9c38697b937aef436b7d6a53cff9a6d4d47aad60c2d14983e931da3cc": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "balance",
-              "type": "uint256"
-            }
-          ],
-          "name": "EthBalanceChange",
-          "type": "event"
-        },
-        "0xb486a8060a6238f98a4851b9c98b78fcd1b052b434dad5b30dc3ca31063df873": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "balance",
-              "type": "uint256"
-            }
-          ],
-          "name": "EthReservedBalanceChange",
-          "type": "event"
-        },
-        "0xb845d1268702d27ff6f56722cc54204649b096d86c120f1469bd7c446049c01d": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "tradeId",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "orderId",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "tokenId",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "trader1",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "trader2",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "price",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "date",
-              "type": "uint256"
-            }
-          ],
-          "name": "NewTrade",
-          "type": "event"
-        },
-        "0x4e90531decf11ba7b2cf9c19322f06d9fea54a3707f8d71bf678fdfdfa20f57a": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "orderId",
-              "type": "uint256"
-            }
-          ],
-          "name": "OrderRemoval",
-          "type": "event"
-        },
-        "0x288076ee5e10de6c038192ef83911bfe6b347ecb651d2f6035a1a4d172608442": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "orderId",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "trader",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "enum DexBase.Side",
-              "name": "side",
-              "type": "uint8"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "tokenId",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "filled",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "price",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
-            }
-          ],
-          "name": "OrderUpsert",
-          "type": "event"
-        },
-        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferred",
-          "type": "event"
-        },
-        "0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            }
-          ],
-          "name": "Paused",
-          "type": "event"
-        },
-        "0x0900e4995c14b4dddd66912896cf782669558020f363ce2c94a3912722a9c925": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "tokenId",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "sharesReservedBalance",
-              "type": "uint256"
-            }
-          ],
-          "name": "SharesReservedBalanceChange",
-          "type": "event"
-        },
-        "0x5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            }
-          ],
-          "name": "Unpaused",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0x0CB8A2A1bE93437629f71c49b645d29EF36A51D4"
-    }
-  },
+  "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-07-21T11:46:13.293Z",
+  "updatedAt": "2021-07-21T11:53:21.107Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

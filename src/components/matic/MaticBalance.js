@@ -4,9 +4,14 @@ import Box from '@material-ui/core/Box';
 import DepositMaticDialog from './DepositMaticDialog.js';
 import WithdrawMaticDialog from './WithdrawMaticDialog.js';
 import { Button } from '@material-ui/core/'
-import Web3 from 'web3';
+import { useApolloClient } from '@apollo/client';
+import {
+    getBalanceFromGraph
+} from '../../util/graphDataReader.js';
 
 const MaticBalance = ({ accounts, dexContract }) => {
+    const apolloClient = useApolloClient();
+
     const [maticBalance, setMaticBalance] = useState(0);
     const [maticReservedBalance, setMaticReservedBalance] = useState(0);
     const [maticDepositDialogOpen, setMaticDepositDialogOpen] = useState(false);
@@ -14,12 +19,10 @@ const MaticBalance = ({ accounts, dexContract }) => {
 
     useEffect(() => {
         const loadMaticBalance = async () => {
-            let maticBalanceFromChain = await dexContract.methods.getEthBalance(accounts[0]).call();
-            maticBalanceFromChain = Web3.utils.fromWei(maticBalanceFromChain, 'ether');
-            setMaticBalance(maticBalanceFromChain);
-            let maticReservedBalanceFromChain = await dexContract.methods.getEthReserveBalance(accounts[0]).call();
-            maticReservedBalanceFromChain = Web3.utils.fromWei(maticReservedBalanceFromChain, 'ether');
-            setMaticReservedBalance(maticReservedBalanceFromChain);
+            const [maticBalanceFromGraph, maticReservedBalanceFromGraph,] =
+                await getBalanceFromGraph(apolloClient, accounts[0].toLowerCase(), "");
+            setMaticBalance(maticBalanceFromGraph);
+            setMaticReservedBalance(maticReservedBalanceFromGraph);
         }
         loadMaticBalance();
         // eslint-disable-next-line

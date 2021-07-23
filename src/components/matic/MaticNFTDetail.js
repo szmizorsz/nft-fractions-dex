@@ -26,10 +26,14 @@ import PlaceBuyOrder from './PlaceBuyOrder.js';
 import PlaceSellOrder from './PlaceSellOrder.js';
 import TokenTransferApprovalDialog from './TokenTransferApprovalDialog.js';
 import NftFractionsRepository from '../../contracts/matic/MaticNftFractionsRepository.json';
-import Dex from '../../contracts/matic/Dex.json';
+import MaticDex from '../../contracts/matic/MaticDex.json';
 import MaticBridge from '../../contracts/matic/MaticBridge.json';
 import TokenTransferAcrossChainsDialog from './TokenTransferAcrossChainsDialog.js';
-import { gql, useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client';
+import {
+    getTokenDataFromGraph,
+    getBalanceFromGraph
+} from '../../util/graphDataReader.js';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -71,30 +75,6 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
     const [selectedNetwork, setSelectedNetwork] = useState(0);
     const [tokenTransferAccrossChainsDialogOpen, setTokenTransferAccrossChainsDialogOpen] = useState(false);
 
-    const GET_TOKEN = `
-    query getToken($identifier: BigInt){
-        tokens (
-          where: {
-            identifier: $identifier
-          }
-        ) {
-          id
-          identifier
-          totalSupply
-          tokenURI
-          erc721ContractAddress
-          erc721TokenId
-          balances {
-            id
-            value
-            account {
-                id
-            }
-          }
-        }
-        }
-    `
-
     useEffect(() => {
         const init = async () => {
             const networkId = await web3.eth.net.getId();
@@ -104,9 +84,9 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
                 NftFractionsRepository.abi,
                 deployedNetwork && deployedNetwork.address,
             );
-            deployedNetwork = Dex.networks[networkId];
+            deployedNetwork = MaticDex.networks[networkId];
             const dexContract = new web3.eth.Contract(
-                Dex.abi,
+                MaticDex.abi,
                 deployedNetwork && deployedNetwork.address,
             );
             deployedNetwork = MaticBridge.networks[networkId];
@@ -118,14 +98,18 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
             setDexContract(dexContract);
             setMaticBridgeContract(maticBridgeContract);
 
-            const { data } = await apolloClient.query({
-                query: gql(GET_TOKEN),
-                variables: {
-                    identifier: tokenId
-                }
-            })
-            const token = data.tokens[0];
-            const tokenURI = token.tokenURI;
+            const [tokenURI, totalSupply, erc721ContractAddress, erc721TokenId, ownersData, acctualAccountsShares, buyOrders, sellOrders] =
+                await getTokenDataFromGraph(apolloClient, tokenId, accounts[0].toLowerCase());
+            setTotalShares(totalSupply);
+            setOriginalContract(erc721ContractAddress);
+            setOriginalTokenId(erc721TokenId);
+            setOwners(ownersData);
+            setMyShares(acctualAccountsShares);
+            setBuyOrders(buyOrders);
+            setBuyOrderAvailable(buyOrders.length > 0);
+            setSellOrders(sellOrders);
+            setSellOrderAvailable(sellOrders.length > 0);
+
             let nftMetadataFromIPFS = { name: 'name' };
             for await (const file of ipfs.get(tokenURI)) {
                 const content = new BufferList()
@@ -137,52 +121,11 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
             nftMetadataFromIPFS.tokenId = tokenId;
             setMetadata(nftMetadataFromIPFS);
 
-            setTotalShares(token.totalSupply);
-            setOriginalContract(token.erc721ContractAddress);
-            setOriginalTokenId(token.erc721TokenId);
-
-            let ownersData = [];
-            let acctualAccountsShares = 0;
-            if (token.balances.length > 0) {
-                for (let balance of token.balances) {
-                    debugger
-                    let owner = balance.account.id;
-                    let ownerShares = balance.value;
-                    let ownerData = {
-                        "owner": owner,
-                        "shares": ownerShares
-                    }
-                    ownersData.push(ownerData);
-                    if (owner === accounts[0].toLowerCase()) {
-                        acctualAccountsShares = ownerShares;
-                    }
-                }
-            }
-            setMyShares(acctualAccountsShares);
-
-            let sharesReservedInOrders = await dexContract.methods.getSharesReserveBalance(accounts[0], tokenId).call();
-            setSharesAvailableForSelling(acctualAccountsShares - sharesReservedInOrders);
-            setOwners(ownersData);
-            const buyOrdersFromChain = await dexContract.methods.getOrders(tokenId, 0).call();
-            const buyOrdersExtended = buyOrdersFromChain.map((item) => ({
-                ...item,
-                ethPrice: web3.utils.fromWei(item.price, 'ether')
-            }));
-            setBuyOrders(buyOrdersExtended);
-            const sellOrdersFromChain = await dexContract.methods.getOrders(tokenId, 1).call();
-            const sellOrdersExtended = sellOrdersFromChain.map((item) => ({
-                ...item,
-                ethPrice: web3.utils.fromWei(item.price, 'ether')
-            }));
-            setBuyOrderAvailable(buyOrdersExtended.length > 0);
-            setSellOrders(sellOrdersExtended);
-            let maticBalanceFromChain = await dexContract.methods.getEthBalance(accounts[0]).call();
-            maticBalanceFromChain = web3.utils.fromWei(maticBalanceFromChain, 'ether');
-            setSellOrderAvailable(sellOrdersExtended.length > 0);
-            setEthBalance(maticBalanceFromChain);
-            let maticReservedBalanceFromChain = await dexContract.methods.getEthReserveBalance(accounts[0]).call();
-            maticReservedBalanceFromChain = web3.utils.fromWei(maticReservedBalanceFromChain, 'ether');
-            setEthReservedBalance(maticReservedBalanceFromChain);
+            const [maticBalance, maticReservedBalance, sharesReservedBalance] =
+                await getBalanceFromGraph(apolloClient, accounts[0].toLowerCase(), "0x" + tokenId);
+            setEthBalance(maticBalance);
+            setEthReservedBalance(maticReservedBalance);
+            setSharesAvailableForSelling(acctualAccountsShares - sharesReservedBalance);
         }
         init();
         // eslint-disable-next-line
@@ -272,7 +215,7 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
                             <Box mb={3}>
                                 <Typography className={classes.heading}>Buy Orders</Typography>
                             </Box>
-                            <BuyOrders orders={buyOrders} accounts={accounts} dexContract={dexContract} setBuyOrders={setBuyOrders} web3={web3} />
+                            <BuyOrders orders={buyOrders} accounts={accounts} dexContract={dexContract} setBuyOrders={setBuyOrders} />
                             <Button
                                 onClick={() => { setPlaceBuyOrderDialogOpen(true) }}
                                 variant="outlined"
@@ -285,7 +228,7 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
                             <Box mb={3}>
                                 <Typography className={classes.heading}>Sell Orders</Typography>
                             </Box>
-                            <SellOrders orders={sellOrders} accounts={accounts} dexContract={dexContract} setSellOrders={setSellOrders} web3={web3} />
+                            <SellOrders orders={sellOrders} accounts={accounts} dexContract={dexContract} setSellOrders={setSellOrders} />
                             <Button
                                 onClick={() => { setPlaceSellOrderDialogOpen(true) }}
                                 variant="outlined"

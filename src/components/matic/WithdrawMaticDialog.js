@@ -8,6 +8,10 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Web3 from 'web3';
 import Alert from '@material-ui/lab/Alert';
 import TransactionNotification from './TransactionNotification.js';
+import { useApolloClient } from '@apollo/client';
+import {
+    getBalanceFromGraph
+} from '../../util/graphDataReader.js';
 
 const WithdrawMaticDialog = ({ maticBalance, accounts, dexContract, maticWithdrawDialogOpen, setMaticWithdrawDialogOpen, setMaticBalance }) => {
     const defaultDialogContentText = 'Please, specify the amount (Matic) to withdraw.';
@@ -15,6 +19,8 @@ const WithdrawMaticDialog = ({ maticBalance, accounts, dexContract, maticWithdra
     const [transactionNotificationOpen, setTransactionNotificationOpen] = React.useState(false);
     const [transactionNotificationText, setTransactionNotificationText] = React.useState("");
     const [amount, setAmount] = React.useState('');
+
+    const apolloClient = useApolloClient();
 
     const handleSubmit = async () => {
         if (parseFloat(amount) > parseFloat(maticBalance)) {
@@ -35,9 +41,9 @@ const WithdrawMaticDialog = ({ maticBalance, accounts, dexContract, maticWithdra
             .on("receipt", async function (receipt) {
                 setTransactionNotificationText("Transaction has been confirmed");
                 setTransactionNotificationOpen(true);
-                let maticBalanceFromChain = await dexContract.methods.getEthBalance(accounts[0]).call();
-                maticBalanceFromChain = Web3.utils.fromWei(maticBalanceFromChain, 'ether');
-                setMaticBalance(maticBalanceFromChain);
+                const [maticBalanceFromGraph, ,] =
+                    await getBalanceFromGraph(apolloClient, accounts[0].toLowerCase(), "");
+                setMaticBalance(maticBalanceFromGraph);
             })
             .on("error", function (error) {
                 setTransactionNotificationText("Transaction error: " + error);

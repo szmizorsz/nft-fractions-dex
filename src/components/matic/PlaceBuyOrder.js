@@ -11,6 +11,10 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography'
 import Box from '@material-ui/core/Box';
 import TransactionNotification from './TransactionNotification.js';
+import { useApolloClient } from '@apollo/client';
+import {
+    getOrdersFromGraph
+} from '../../util/graphDataReader.js';
 
 const PlaceBuyOrder = ({
     web3,
@@ -31,6 +35,8 @@ const PlaceBuyOrder = ({
     const [dialogContentText, setDialogContentText] = React.useState(defaultDialogContentText);
     const [transactionNotificationOpen, setTransactionNotificationOpen] = React.useState(false);
     const [transactionNotificationText, setTransactionNotificationText] = React.useState("");
+
+    const apolloClient = useApolloClient();
 
     const handleSubmit = async () => {
         if (marketPerLimit === 'limit' && (price === '' || price < 0)) {
@@ -83,12 +89,8 @@ const PlaceBuyOrder = ({
                 .on("receipt", async function (receipt) {
                     setTransactionNotificationText("Transaction has been confirmed");
                     setTransactionNotificationOpen(true);
-                    const buyOrdersFromChain = await dexContract.methods.getOrders(tokenId, 0).call();
-                    const buyOrdersExtended = buyOrdersFromChain.map((item) => ({
-                        ...item,
-                        ethPrice: web3.utils.fromWei(item.price, 'ether')
-                    }));
-                    setBuyOrders(buyOrdersExtended);
+                    const [buyOrdersFromGraph,] = await getOrdersFromGraph(apolloClient, "0x" + tokenId);
+                    setBuyOrders(buyOrdersFromGraph);
                 })
                 .on("error", function (error) {
                     setTransactionNotificationText("Transaction error: " + error);

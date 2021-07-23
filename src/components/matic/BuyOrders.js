@@ -18,6 +18,10 @@ import { TextField } from '@material-ui/core/';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
 import TransactionNotification from './TransactionNotification.js';
+import { useApolloClient } from '@apollo/client';
+import {
+    getOrdersFromGraph
+} from '../../util/graphDataReader.js';
 
 const useStyles = makeStyles({
     table: {
@@ -30,15 +34,17 @@ const useStyles = makeStyles({
     },
 });
 
-const Row = ({ row, accounts, dexContract, setBuyOrders, web3 }) => {
+const Row = ({ row, accounts, dexContract, setBuyOrders }) => {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const [transactionNotificationOpen, setTransactionNotificationOpen] = React.useState(false);
     const [transactionNotificationText, setTransactionNotificationText] = React.useState("");
 
+    const apolloClient = useApolloClient();
+
     const deleteIconDisplay = (row, accounts, dexContract) => {
         let deleteIcon;
-        if (row.trader === accounts[0]) {
+        if (row.trader === accounts[0].toLowerCase()) {
             deleteIcon = <Tooltip title="Delete">
                 <IconButton aria-label="delete" onClick={() => { handleOrderDelete(row.tokenId, row.id, accounts, dexContract) }}>
                     <DeleteIcon />
@@ -52,6 +58,7 @@ const Row = ({ row, accounts, dexContract, setBuyOrders, web3 }) => {
         let config = {
             from: accounts[0]
         };
+        debugger
         await dexContract.methods.deleteOrder(tokenId, 0, orderId).send(config)
             .on("transactionHash", function (transactionHash) {
                 setTransactionNotificationText("Transaction sent: " + transactionHash);
@@ -60,12 +67,8 @@ const Row = ({ row, accounts, dexContract, setBuyOrders, web3 }) => {
             .on("receipt", async function (receipt) {
                 setTransactionNotificationText("Transaction has been confirmed");
                 setTransactionNotificationOpen(true);
-                const buyOrdersFromChain = await dexContract.methods.getOrders(tokenId, 0).call();
-                const buyOrdersExtended = buyOrdersFromChain.map((item) => ({
-                    ...item,
-                    ethPrice: web3.utils.fromWei(item.price, 'ether')
-                }));
-                setBuyOrders(buyOrdersExtended);
+                const [buyOrdersFromGraph,] = await getOrdersFromGraph(apolloClient, "0x" + tokenId);
+                setBuyOrders(buyOrdersFromGraph);
             })
             .on("error", function (error) {
                 setTransactionNotificationText("Transaction error: " + error);

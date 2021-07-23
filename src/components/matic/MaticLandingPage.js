@@ -11,7 +11,7 @@ import DepositNft from './DepositNft.js'
 import Grid from '@material-ui/core/Grid';
 import MaticBalance from './MaticBalance.js'
 import MaticNftFractionsRepository from '../../contracts/matic/MaticNftFractionsRepository.json';
-import Dex from '../../contracts/matic/Dex.json';
+import MaticDex from '../../contracts/matic/MaticDex.json';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -105,9 +105,9 @@ const MaticLandingPage = ({ web3, accounts, ipfs }) => {
                 MaticNftFractionsRepository.abi,
                 deployedNetwork && deployedNetwork.address,
             );
-            deployedNetwork = Dex.networks[networkId];
+            deployedNetwork = MaticDex.networks[networkId];
             const dexContract = new web3.eth.Contract(
-                Dex.abi,
+                MaticDex.abi,
                 deployedNetwork && deployedNetwork.address,
             );
             setNftFractionsRepositoryContract(nftFractionsRepositoryContract);
