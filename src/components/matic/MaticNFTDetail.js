@@ -6,7 +6,6 @@ import TokenOwners from './TokenOwners.js';
 import Grid from '@material-ui/core/Grid';
 import NFTDescription from './NFTDescription.js'
 import Box from '@material-ui/core/Box';
-import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
@@ -34,6 +33,24 @@ import {
     getTokenDataFromGraph,
     getBalanceFromGraph
 } from '../../util/graphDataReader.js';
+import MuiAccordion from '@material-ui/core/Accordion';
+import withStyles from "@material-ui/core/styles/withStyles";
+import Trades from './Trades.js'
+
+const IconLeftAccordionSummary = withStyles({
+    expandIcon: {
+        order: -1
+    }
+})(AccordionSummary);
+
+const Accordion = withStyles({
+    root: {
+        border: 'none',
+        boxShadow: 'none',
+
+    },
+    expanded: {},
+})(MuiAccordion);
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -64,6 +81,7 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
     const [originalTokenId, setOriginalTokenId] = useState("");
     const [buyOrders, setBuyOrders] = useState([]);
     const [sellOrders, setSellOrders] = useState([]);
+    const [trades, setTrades] = useState([]);
     const [placeBuyOrderDialogOpen, setPlaceBuyOrderDialogOpen] = useState(false);
     const [placeSellOrderDialogOpen, setPlaceSellOrderDialogOpen] = useState(false);
     const [maticBalance, setEthBalance] = useState(0);
@@ -98,7 +116,7 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
             setDexContract(dexContract);
             setMaticBridgeContract(maticBridgeContract);
 
-            const [tokenURI, totalSupply, erc721ContractAddress, erc721TokenId, ownersData, acctualAccountsShares, buyOrders, sellOrders] =
+            const [tokenURI, totalSupply, erc721ContractAddress, erc721TokenId, ownersData, acctualAccountsShares, buyOrders, sellOrders, trades] =
                 await getTokenDataFromGraph(apolloClient, tokenId, accounts[0].toLowerCase());
             setTotalShares(totalSupply);
             setOriginalContract(erc721ContractAddress);
@@ -109,6 +127,8 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
             setBuyOrderAvailable(buyOrders.length > 0);
             setSellOrders(sellOrders);
             setSellOrderAvailable(sellOrders.length > 0);
+            setTrades(trades);
+            debugger
 
             let nftMetadataFromIPFS = { name: 'name' };
             for await (const file of ipfs.get(tokenURI)) {
@@ -237,6 +257,20 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
                             </Button>
                         </Grid>
                     </Grid>
+                </Box>
+                <Box mt={5}>
+                    <Accordion>
+                        <IconLeftAccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="panel1a-content"
+                            id="panel1a-header"
+                        >
+                            <Box ml={3}><Typography>Trade History</Typography></Box>
+                        </IconLeftAccordionSummary>
+                        <AccordionDetails>
+                            <Box ml={3}><Trades trades={trades} /></Box>
+                        </AccordionDetails>
+                    </Accordion>
                 </Box>
             </Box >
             <PlaceBuyOrder
