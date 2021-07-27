@@ -1,6 +1,6 @@
 const ERC721Mock = artifacts.require("ERC721Mock");
-const BscNftFractionsRepository = artifacts.require("BscNftFractionsRepository");
-const BscBridge = artifacts.require("BscBridge");
+const MaticNftFractionsRepository = artifacts.require("MaticNftFractionsRepository");
+const MaticBridge = artifacts.require("MaticBridge");
 const truffleAssert = require("truffle-assertions");
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
@@ -20,10 +20,10 @@ contract("Bsc bridge tests", async function (accounts) {
         await erc721MockInstance.mint(nftOwner, erc721TokenId);
         await erc721MockInstance.setTokenURI(erc721TokenId, tokenURI);
 
-        nftFractionsRepositoryInstance = await deployProxy(BscNftFractionsRepository, ["URI"]);
+        nftFractionsRepositoryInstance = await deployProxy(MaticNftFractionsRepository, ["URI"]);
         await nftFractionsRepositoryInstance.mint(erc721MockInstance.address, erc721TokenId, erc1155TokenId, fractionsAmount, fractionsAmount, nftOwner, tokenURI);
 
-        bridgeInstance = await BscBridge.new();
+        bridgeInstance = await MaticBridge.new();
         await bridgeInstance.setNftFractionsRepository(nftFractionsRepositoryInstance.address);
         await nftFractionsRepositoryInstance.transferOwnership(bridgeInstance.address);
     });
@@ -52,16 +52,8 @@ contract("Bsc bridge tests", async function (accounts) {
         assert(tokenDataFromNftFractionsRepositoryInstance.totalFractionsAmount.toNumber() === fractionsAmount);
         assert(tokenDataFromNftFractionsRepositoryInstance.tokenURI === tokenURI);
 
-        let ownersTokens = await nftFractionsRepositoryInstance.getTokenIdsByShareOwner(nftOwner);
-        ownersTokens = ownersTokens.map(item => item.toNumber());
-        expect(ownersTokens).to.have.same.members([erc1155TokenId]);
-
-        let ownersByTokenId = await nftFractionsRepositoryInstance.getOwnersBYtokenId(erc1155TokenId);
-        expect(ownersByTokenId).to.have.same.members([nftOwner]);
-
-        let allTokens = await nftFractionsRepositoryInstance.getTokenIds();
-        allTokens = allTokens.map(item => item.toNumber());
-        expect(allTokens).to.have.same.members([erc1155TokenId]);
+        let balanceAfterTransfer = await nftFractionsRepositoryInstance.balanceOf(nftOwner, erc1155TokenId);
+        assert(balanceAfterTransfer.toNumber() === fractionsAmount - amountToTransfer);
     });
 
     it("should burn all of its shares", async function () {
@@ -89,12 +81,8 @@ contract("Bsc bridge tests", async function (accounts) {
         assert(tokenDataFromNftFractionsRepositoryInstance.totalFractionsAmount.toNumber() === fractionsAmount);
         assert(tokenDataFromNftFractionsRepositoryInstance.tokenURI === tokenURI);
 
-        let ownersTokens = await nftFractionsRepositoryInstance.getTokenIdsByShareOwner(nftOwner);
-        expect(ownersTokens).to.have.lengthOf(0);
-
-        let allTokens = await nftFractionsRepositoryInstance.getTokenIds();
-        allTokens = allTokens.map(item => item.toNumber());
-        expect(allTokens).to.have.same.members([erc1155TokenId]);
+        let balanceAfterTransfer = await nftFractionsRepositoryInstance.balanceOf(nftOwner, erc1155TokenId);
+        assert(balanceAfterTransfer.toNumber() === fractionsAmount - amountToTransfer);
     });
 
     it("should not burn while the contract is paused", async function () {
@@ -139,17 +127,6 @@ contract("Bsc bridge tests", async function (accounts) {
 
         let ownersBalance = await nftFractionsRepositoryInstance.balanceOf(nftOwner, erc1155TokenId);
         assert(ownersBalance.toNumber() === fractionsAmount + amountToMint);
-
-        let ownersTokens = await nftFractionsRepositoryInstance.getTokenIdsByShareOwner(nftOwner);
-        ownersTokens = ownersTokens.map(item => item.toNumber());
-        expect(ownersTokens).to.have.same.members([erc1155TokenId]);
-
-        let ownersByTokenId = await nftFractionsRepositoryInstance.getOwnersBYtokenId(erc1155TokenId);
-        expect(ownersByTokenId).to.have.same.members([nftOwner]);
-
-        let allTokens = await nftFractionsRepositoryInstance.getTokenIds();
-        allTokens = allTokens.map(item => item.toNumber());
-        expect(allTokens).to.have.same.members([erc1155TokenId]);
     });
 
     it("should mint shares for a token that does not exists on the chain yet", async function () {
@@ -181,17 +158,6 @@ contract("Bsc bridge tests", async function (accounts) {
 
         let ownersBalance = await nftFractionsRepositoryInstance.balanceOf(nftOwner, newErc1155TokenId);
         assert(ownersBalance.toNumber() === amountToMint);
-
-        let ownersTokens = await nftFractionsRepositoryInstance.getTokenIdsByShareOwner(nftOwner);
-        ownersTokens = ownersTokens.map(item => item.toNumber());
-        expect(ownersTokens).to.have.same.members([erc1155TokenId, newErc1155TokenId]);
-
-        let ownersByTokenId = await nftFractionsRepositoryInstance.getOwnersBYtokenId(newErc1155TokenId);
-        expect(ownersByTokenId).to.have.same.members([nftOwner]);
-
-        let allTokens = await nftFractionsRepositoryInstance.getTokenIds();
-        allTokens = allTokens.map(item => item.toNumber());
-        expect(allTokens).to.have.same.members([erc1155TokenId, newErc1155TokenId]);
     });
 
     it("should not mint while the contract is paused", async function () {
