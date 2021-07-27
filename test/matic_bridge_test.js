@@ -4,7 +4,7 @@ const MaticBridge = artifacts.require("MaticBridge");
 const truffleAssert = require("truffle-assertions");
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
-contract("Bsc bridge tests", async function (accounts) {
+contract("Matic bridge tests", async function (accounts) {
     let nftFractionsRepositoryInstance;
     let erc721MockInstance;
     let bridgeInstance;

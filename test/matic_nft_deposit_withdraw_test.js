@@ -3,7 +3,7 @@ const MaticNftFractionsRepository = artifacts.require("MaticNftFractionsReposito
 const truffleAssert = require("truffle-assertions");
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
-contract("MaticNftFractionsRepository", async function (accounts) {
+contract("Matic nft depsit and withdraw", async function (accounts) {
     let nftFractionsRepositoryInstance;
     let erc721MockInstance;
     let nftOwner = accounts[1];
