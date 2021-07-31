@@ -195,6 +195,7 @@ export async function getTokenDataFromGraph(apolloClient, tokenId, account) {
     .map((ownerData) => {
       return ownerData.shares
     });
+  acctualAccountsShares = acctualAccountsShares.length === 1 ? acctualAccountsShares[0] : 0;
   const ordersMapped = data.tokens[0].orders
     .map((order) => ({
       ...order,
