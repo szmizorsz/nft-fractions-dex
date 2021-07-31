@@ -128,7 +128,6 @@ const MaticNFTDetail = ({ match, web3, accounts, ipfs }) => {
             setSellOrders(sellOrders);
             setSellOrderAvailable(sellOrders.length > 0);
             setTrades(trades);
-            debugger
 
             let nftMetadataFromIPFS = { name: 'name' };
             for await (const file of ipfs.get(tokenURI)) {

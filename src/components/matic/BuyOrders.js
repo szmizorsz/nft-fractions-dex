@@ -58,7 +58,6 @@ const Row = ({ row, accounts, dexContract, setBuyOrders }) => {
         let config = {
             from: accounts[0]
         };
-        debugger
         await dexContract.methods.deleteOrder(tokenId, 0, orderId).send(config)
             .on("transactionHash", function (transactionHash) {
                 setTransactionNotificationText("Transaction sent: " + transactionHash);

@@ -26,7 +26,7 @@ import PlaceBuyOrder from './PlaceBuyOrder.js';
 import PlaceSellOrder from './PlaceSellOrder.js';
 import TokenTransferApprovalDialog from './TokenTransferApprovalDialog.js';
 import BscNftFractionsRepository from '../../contracts/bsc/BscNftFractionsRepository.json';
-import Dex from '../../contracts/bsc/Dex.json';
+import BscDex from '../../contracts/bsc/BscDex.json';
 import BscBridge from '../../contracts/bsc/BscBridge.json';
 import TokenTransferAcrossChainsDialog from './TokenTransferAcrossChainsDialog.js';
 
@@ -78,9 +78,9 @@ const BscNFTDetail = ({ match, web3, accounts, ipfs }) => {
                 BscNftFractionsRepository.abi,
                 deployedNetwork && deployedNetwork.address,
             );
-            deployedNetwork = Dex.networks[networkId];
+            deployedNetwork = BscDex.networks[networkId];
             const dexContract = new web3.eth.Contract(
-                Dex.abi,
+                BscDex.abi,
                 deployedNetwork && deployedNetwork.address,
             );
             deployedNetwork = BscBridge.networks[networkId];

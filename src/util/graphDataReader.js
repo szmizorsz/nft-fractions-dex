@@ -240,7 +240,6 @@ query getOrder($tokenId: String) {
   }
 `
 export async function getOrdersFromGraph(apolloClient, tokenId) {
-  debugger
   const { data } = await apolloClient.query({
     query: gql(GET_ORDERS),
     variables: {

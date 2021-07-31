@@ -9,7 +9,6 @@ const AllNFTs = ({ accounts, nftFractionsRepositoryContract, ipfs }) => {
         const loadNfts = async () => {
             const nftsFromIpfs = [];
             const tokenIds = await nftFractionsRepositoryContract.methods.getTokenIds().call();
-            debugger
             for (let tokenId of tokenIds) {
                 const tokenData = await nftFractionsRepositoryContract.methods.getTokenData(tokenId).call();
                 const myShares = await nftFractionsRepositoryContract.methods.balanceOf(accounts[0], tokenId).call()

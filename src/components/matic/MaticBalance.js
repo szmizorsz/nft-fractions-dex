@@ -41,7 +41,7 @@ const MaticBalance = ({ accounts, dexContract }) => {
                 </Typography>
             </Box>
             <Button
-                onClick={() => { debugger; setMaticDepositDialogOpen(true) }}
+                onClick={() => { setMaticDepositDialogOpen(true) }}
                 variant="outlined"
                 type="submit">
                 Deposit
