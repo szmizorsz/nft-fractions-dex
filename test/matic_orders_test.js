@@ -274,6 +274,11 @@ contract("MaticDex orders", async function (accounts) {
                 && e.price.toNumber() === price2;
         }, 'event params incorrect');
 
+        truffleAssert.eventEmitted(result, 'OrderRemoval');
+        truffleAssert.eventEmitted(result, 'OrderRemoval', (e) => {
+            return e.orderId.toNumber() === 1;
+        }, 'event params incorrect');
+
         truffleAssert.eventEmitted(result, 'NewTrade');
         truffleAssert.eventEmitted(result, 'NewTrade', (e) => {
             return e.orderId.toNumber() === 1
@@ -468,6 +473,11 @@ contract("MaticDex orders", async function (accounts) {
                 && e.price.toNumber() === price;
         }, 'event params incorrect');
 
+        truffleAssert.eventEmitted(result, 'OrderRemoval');
+        truffleAssert.eventEmitted(result, 'OrderRemoval', (e) => {
+            return e.orderId.toNumber() === 1;
+        }, 'event params incorrect');
+
         truffleAssert.eventEmitted(result, 'SharesReservedBalanceChange');
         truffleAssert.eventEmitted(result, 'SharesReservedBalanceChange', (e) => {
             return e.account === nftOwner
@@ -567,6 +577,11 @@ contract("MaticDex orders", async function (accounts) {
                 && e.trader2 === buyer
                 && e.amount.toNumber() === amount
                 && e.price.toNumber() === price;
+        }, 'event params incorrect');
+
+        truffleAssert.eventEmitted(result, 'OrderRemoval');
+        truffleAssert.eventEmitted(result, 'OrderRemoval', (e) => {
+            return e.orderId.toNumber() === 1;
         }, 'event params incorrect');
 
         truffleAssert.eventEmitted(result, 'SharesReservedBalanceChange');
@@ -685,6 +700,11 @@ contract("MaticDex orders", async function (accounts) {
                 && e.trader2 === buyer
                 && e.amount.toNumber() === amount
                 && e.price.toNumber() === price;
+        }, 'event params incorrect');
+
+        truffleAssert.eventEmitted(result, 'OrderRemoval');
+        truffleAssert.eventEmitted(result, 'OrderRemoval', (e) => {
+            return e.orderId.toNumber() === 1;
         }, 'event params incorrect');
 
         truffleAssert.eventEmitted(result, 'SharesReservedBalanceChange');

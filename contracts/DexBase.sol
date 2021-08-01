@@ -278,10 +278,10 @@ contract DexBase is Initializable, PausableUpgradeable, OwnableUpgradeable {
 
         i = 0;
         while (i < orders.length && orders[i].filled == orders[i].amount) {
+            _onOrderRemoval(orders[i].id);
             for (uint256 j = i; j < orders.length - 1; j++) {
                 orders[j] = orders[j + 1];
             }
-            _onOrderRemoval(orders[orders.length - 1].id);
             orders.pop();
             i++;
         }
