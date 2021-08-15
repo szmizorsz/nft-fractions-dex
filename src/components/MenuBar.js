@@ -31,7 +31,7 @@ function MenuBar() {
                     <Grid item xs={12} md={3}>
                         <Box mt={0.5}>
                             <a href="/">
-                                <img src={logo} alt="Real Estate Management Platform" className={classes.logo} />
+                                <img src={logo} alt="NFT Fractions DEX" className={classes.logo} />
                             </a>
                         </Box>
                     </Grid>

@@ -6,6 +6,7 @@ import MaticLandingPage from './components/matic/MaticLandingPage.js';
 import MaticNFTDetail from './components/matic/MaticNFTDetail.js';
 import BscLandingPage from './components/bsc/BscLandingPage.js';
 import BscNFTDetail from './components/bsc/BscNFTDetail.js';
+import HomePage from './components/HomePage.js';
 import {
   HashRouter as Router,
   Switch,
@@ -64,6 +65,7 @@ function App() {
                 <Route path="/matic/nft/:tokenId" render={(props) => <MaticNFTDetail {...props} web3={web3} accounts={accounts} ipfs={ipfs} />} />
                 <Route path="/bsc/landing" render={(props) => <BscLandingPage {...props} web3={web3} accounts={accounts} ipfs={ipfs} />} />
                 <Route path="/bsc/nft/:tokenId" render={(props) => <BscNFTDetail {...props} web3={web3} accounts={accounts} ipfs={ipfs} />} />
+                <Route path="/"><HomePage /></Route>
               </Switch>
             </Box>
           </Grid>
