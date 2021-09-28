@@ -1,11 +1,15 @@
 const Web3 = require('web3');
 const BscBridge = require('../contracts/bsc/BscBridge.json');
 const MaticBridge = require('../contracts/matic/MaticBridge.json');
-
-const web3Bsc = new Web3('https://data-seed-prebsc-1-s1.binance.org:8545');
-const web3Matic = new Web3('https://rpc-mumbai.matic.today');
-
 const fs = require('fs');
+
+const getblockIoKey = fs.readFileSync("../../.getblock_io_key").toString().trim();
+const provider = new Web3.providers.HttpProvider("https://bsc.getblock.io/testnet/?api_key=" + getblockIoKey);
+const web3Bsc = new Web3(provider);
+
+const infuraKey = fs.readFileSync("../../.infura_key").toString().trim();
+const web3Matic = new Web3(`https://polygon-mumbai.infura.io/v3/` + infuraKey);
+
 const adminPrivKey = fs.readFileSync(".admin_key").toString().trim();
 const { address: admin } = web3Bsc.eth.accounts.wallet.add(adminPrivKey);
 web3Matic.eth.accounts.wallet.add(adminPrivKey);
