@@ -1,0 +1,17 @@
+This series of articles concentrate more on the concepts and the smart contract part of the application but it worth to have a separate article on some other aspects too: UI, deployment, hosting and decentralisation.
+The UI is a usual React application with a minimalistic design thanks to Material-UI. Since the application is quite small there is nothing extra that is used. There is no application state management library. I am planning to try out Drizzle but that is for the next time.
+Let's talk about the hosting. Is our application truly decentralised?
+Smart contracts on EVM compatible chains are more or less decentralised. I do not want to enter into the debate how decentralised BSC or Polygon chains are. Let's say at least they have multiple validators. But they are much less decentralised than ETH2.0 will be. But that's what we have for now.
+What about the UI? The UI is deployed and hosted by Fleek. It comes with two hosting possibilities in the same time. The application is hosted from IPFS and from Fleek's internal hosting environment as well:
+- https://nft-fractions-dex.eth.limo/#/
+- https://round-hill-1400.on.fleek.co/#/
+We have our own ENS domain name: nft-fractions-dex.eth which is linked to the IPSF's InterPlanetary Name System (IPNS) address in the ENS record. So our UI is truly decentralised with the hosting from IPFS and decentralised naming through ENS. We can reach our ENS domain through ETH.lime which is a decentralised alternative to eth.link and represents another big step towards a true dWeb. So far so good our application is truly decentralised but let's be honest it can be quite slow. So in that case I recommend to step back to Fleek's internally hosted version.
+The Polygon part of our application uses the Graph to read data from. The subgraph is hosted at theGraph's Hosted service that is a centralised service. The good news is that theGraph is becoming more and more decentralised.
+But wait a minute we forgot our good old Bridge component. That one is not decentralised at all. It is a single process run by node.js on an AWS EC2 Linux instance. Yes, I know, the decentralisation of the Bridge component remains to be solved.
+The deployment is quite simple:
+Smart contracts are deployed by Truffle to both chains. The only drawback is that I always have to adjust the "contract build directory" in the truffle config according to which chain I am deploying to.
+UI is deployed by Fleek automatically from the GitHub repository. It also takes care of the ENS record update. Nothing to do here.
+The Bridge component deployment to AWS is manual.
+
+There is one extra step in the deployment which the deployment of an ER721 contract and minting ERC721 NFTs. These are the mock, fake or test NFTs that can be deposited to the exchange and mint shares for them. These NFTs are solar eclipse images that I find beautiful. The metadata and the images of these NFTs are served from IPFS as well.
+So as you can see the application is more or less decentralised as it can be these days. But this is already quite impressive how far a dApp can go into decentralisation.
