@@ -1,0 +1,71 @@
+Dex contracts
+NFT Fractions Decentralised Exchange does not implement the AMM (automated market maker) model. It uses the older order book model instead which means that it registers orders of traders and matches them against each other. This is obviously inefficient compared to the AMM model but is more simple to implement. The exchange can handle limit orders and market orders. Limit orders are set to be executed at a given price while market orders immediately match against the best prices independently from the actual price. You can read a longer explanation here.
+Let's look at the Dex contract group:
+The base contract keeps track of the necessary data structures:
+ETH balances of traders
+ETH reserved balances of traders that keeps the total ETH amount reserved currently in orders of each trader
+Order book containing order structs that represents individual orders. Orders are organised into two buckets: buying and selling orders.
+Shares reserved that keeps the number of shares reserved in orders per NFTs and owners
+
+Note: ETH is named as counter trade currency in the base contract. This is because contracts are deployed into EVM compatible chains (BSC and Polygon) so ETH is handled as an abstraction of BSC and Matic.
+The base contract's functions:
+Deposit ETH and withdraw ETH: to handle the counter trade currency deposits and withdrawals
+Create limit order: as the name suggests it creates a limit order in the order book. It keeps the order book organised in the following way:
+- Buy orders are kept in descending order of their price.
+- Meanwhile sell orders are kept in ascending order of their price.
+This is like the way we can see order books in traditional exchanges. It helps the market order matching mechanism.
+Create market order: it creates a market order and automatically matches against the best limit orders. Actually the market order is not even registered in the order book, it is simply matched and executed against limit orders.
+
+There are two simplifications compared to real exchanges:
+Limit orders are not matched against each other, only market orders are matched against the limit ones.
+After matching market orders against limit orders the remaining and not fulfilled part of the market order is lost. Meaning that it is not registered in the order book since the order book currently contains only the limit orders.
+
+Both limitations prevents this model to be used in any real application but makes the model easier to be implemented for the sake of learning experience.
+The most complex part of the contract is the market order creation and matching against limit orders. Let's break it down to the key points:
+1. The matching algorithm executes while there is orders to be matched and the market order has a remaining part to be matched:
+while (i < orders.length && remaining > 0)
+2. Based on the available portion of the limit order and the remaining portion of the market order the matched amount can be calculated:
+uint256 available = orders[i].amount - orders[i].filled;
+uint256 matched = (remaining > available) ? available : remaining;
+remaining = remaining - matched;
+3. There is a difference between sell and buy orders in keeping balances and transferring the counter trade currency. The general idea can be understood with the example from the sell order execution:
+nftFractionsRepository.transferFrom(
+ msg.sender,
+ orders[i].trader,
+ tokenId,
+ matched,
+ ""
+ );
+ethBalance[msg.sender] += orders[i].price * matched;
+ethBalance[orders[i].trader] -= orders[i].price * matched;
+ethReservedBalance[orders[i].trader] -= orders[i].price * matched;
+4. At the end when the matching algorithm finishes there is a maintenance task. The order book has to be cleaned from the fully executed orders. Since elements of an array can only be popped in Solidity (only the last element can be removed) we have to rearrange the order book to contain the fully executed elements at the end and pop them:
+while (i < orders.length && orders[i].filled == orders[i].amount) {
+ _onOrderRemoval(orders[i].id);
+ for (uint256 j = i; j < orders.length - 1; j++) {
+ orders[j] = orders[j + 1];
+ }
+ orders.pop();
+ i++;
+}
+The base contract also defines hook functions to hook in logics in the appropriate points of the execution:
+- On order upsert (insert/update)
+- On order removal
+- On trade execution
+- On ETH balance change
+- On ETH reserved balance change
+- On shares reserved balance change
+These hooks are only implemented in the Polygon version of the Dex contract: MaticDex
+It emits the corresponding events to be captured by the Graph:
+- OrderUpsert
+- OrderRemoval
+- NewTrade
+- EthBalanceChange
+- EthReservedBalanceChange
+- SharesReservedBalanceChange
+In contrast the BSC version of the Dex contract exposes getter functions of the internal data structures:
+- Get orders
+- Get ETH balance
+- Get ETH reserved balance
+- Get shares reserved balance
+They serve the data needs of the order display and execution UI.

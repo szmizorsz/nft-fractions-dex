@@ -1,8 +1,9 @@
 The Bridge
 In this article I would like to explain the Bridge between Polygon and BSC.
 The bridge consists of the following parts:
-- One bridge contract on each chain. So there is a MaticBridge and a BscBridge contract.
-- One active component (let's call this the Bridge component) which listens for Transfer events emitted by any of the bridge contracts and calls the mint function on the other chain's bridge contract.
+One bridge contract on each chain. So there is a MaticBridge and a BscBridge contract.
+One active component (let's call this the Bridge component) which listens for Transfer events emitted by any of the bridge contracts and calls the mint function on the other chain's bridge contract.
+
 The workflow looks like the following:
 1. The user wants to transfer his shares from one chain to another. Let's say from Polygon to BSC. He uses the transfer button on the UI. The front end calls the burn function on the chain specific bridge contract which is the MaticBridge in this example.
 2. The MaticBridge contract calls the burn function on the MaticNftRepository contract so it burns the required amount of the given ERC1155 token. In the same time it emits a Transfer event with the necessary arguments (tokenId, amount, etc.).
@@ -10,7 +11,7 @@ The workflow looks like the following:
 4. The BSC bridge contract calls the mint function on the BSC NFT Fractions Repository contract so the required amount is minted on the BSC chain.
 How can we ensure that only the bridge contract can call the mint and burn functions on the NFT Fractions Repository contracts? We can make the bridge contracts to be the admin of the NFT Fractions Repository contracts on the same chain. In practice the BscBridge contract is the admin of the BscNftFractionsRepository and the MaticBridge is the admin of the MaticNftFractionsRepository. And we attach the onlyOwner modifier to the mint function so only the admin can call it. So far so good but we have to protect the burn function on the bridge contracts as well. This can be achieved with the same manner. The Bridge component will call the burn functions with the admin address of the bridge contracts. This way no-one can burn and mint shares out of thin air.
 The workflow is quite simple but there is one drawback. The Bridge component is a stand-alone process which means that it has to run on a dedicated (centralised) environment. This is the only centralised part of the whole NFT Fractions Dex ecosystem. It runs on AWS, more on that in a later article.
-Let's take a closer a look on the Transfer event which contains all the information that has to be passed between chains. The arguments of the event:
+Let's take a closer a look at the Transfer event which contains all the information that has to be passed between chains. The arguments of the event:
 - from: the address who is sending the shares
 - to: the recipient address of the shares
 - erc1155TokenId: token id
