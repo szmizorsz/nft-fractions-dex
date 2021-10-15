@@ -3,6 +3,7 @@ import { Typography } from "@material-ui/core";
 import GitHubIcon from '@material-ui/icons/GitHub';
 import EmailIcon from '@material-ui/icons/Email';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
+import DescriptionIcon from '@material-ui/icons/Description';
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -28,6 +29,9 @@ const Footer = () => {
             </Typography>
             <Box mr={3}>
                 <Grid container justify="center">
+                    <a href="https://medium.com/@szmizorsz/nft-fractions-decentralised-exchange-introduction-3e696f27c065" target="_blank" rel="noopener noreferrer" >
+                        <DescriptionIcon color='disabled' className={classes.icon} />
+                    </a>
                     <a href="https://github.com/szmizorsz/nft-fractions-dex" target="_blank" rel="noopener noreferrer" >
                         <GitHubIcon color='disabled' className={classes.icon} />
                     </a>
