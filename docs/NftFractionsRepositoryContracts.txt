@@ -1,21 +1,21 @@
 NFT fractions repository contracts
-NFT fractions repositories are based on ERC1155 standard which is the second defacto standard for NFTs besides ERC721. ERC1155 contracts are combination of fungible and non-fungible tokens. In ERC721 each token is unique having its own parameters, metadata, history, etc. Besides that in ERC1155 each token is associated with an amount as well. This amount can be treated as copies of the original token, shares, identical items, or any other meaningful abstraction that you can come up with. ERC1155 was developed by Enjin for representing items of games. These items could be swords (many of the same type), rings (7 in some context)or anything else that could be unique (amount is one - a.k.a non-fungible) or associated with any amount greater than one (fungible). These different items can fit into one single ERC1155 contract. The same effect could be achieved with ERC721 by deploying separate contracts for each item: one contract for swords, one for rings, etc. The downside of this is obvious. You can read more in the original proposal.
-In our case ERC1155 is a straightforward choice for minting fractions of an originally unique NFT. Each token in the NFT Fractions repository represents a unique NFT originally minted in another contract. The amount associated to each ERC1155 token is the minted fractions for this NFT.
-For simplicity the NFT deposit function is only available on Polygon and not on BSC. So the application is kind of asymmetrical in a way that NFT fractions are originated from Polygon and later can be traded on BSC as well after transferring them. From the user experience point of view when the user deposits his NFT to the NFT Fractions Dex the following happens:
+NFT fractions repositories are based on ERC1155 standard which is the second defacto standard for NFTs besides ERC721. ERC1155 contracts are a combination of fungible and non-fungible tokens. In ERC721 each token is unique having its own parameters, metadata, history, etc. Besides that, in ERC1155 each token is associated with an amount as well. This amount can be treated as copies of the original token, shares, identical items, or any other meaningful abstraction that you can come up with. ERC1155 was developed by Enjin for representing items of games. These items could be swords (many of the same type), rings (7 in some context), or anything else that could be unique (amount is one - a.k.a non-fungible) or associated with any amount greater than one (fungible). These different items can fit into one single ERC1155 contract. The same effect could be achieved with ERC721 by deploying separate contracts for each item: one contract for swords, one for rings, etc. The downside of this is obvious. You can read more in the original proposal.
+In our case ERC1155 is a straightforward choice for minting fractions of an originally unique NFT. Each token in the NFT Fractions repository represents a unique NFT originally minted in another contract. The amount associated with each ERC1155 token is the minted fractions for this NFT.
+For simplicity, the NFT deposit function is only available on Polygon and not on BSC. So the application is kind of asymmetrical in a way that NFT fractions are originated from Polygon and later can be traded on BSC as well after transferring them. From the user experience point of view when the user deposits his NFT to the NFT Fractions Dex the following happens:
 - The NFT is transferred to the address of the Dex in the original contract where the NFT was minted. This is the lockup mechanism to prevent the user to sell his NFT unless he withdraws it from the Dex. For keeping things simple the Dex does not use any vault system it just simply transfers the NFT in the original contract.
 - A new ERC1155 token is minted with a given amount that represents the shares/fractions.
-- The ERC1155 standard implements an approval system to enable the token transfer just like in ERC721. So before the deposit the user is asked to approve the Dex contract to transfer his NFT.
-- Only those NFTs can be withdrawn from the Dex whose all shares belong to the same user. In other words the user has to acquire the whole ownership (each shares) of an NFT before withdrawing it.
-Let's have a closer look on the NFT fractions repository contracts:
-The interface defines top level functions that are called from other smart contracts, e.g: from bridge contracts:
+- The ERC1155 standard implements an approval system to enable the token transfer just like in ERC721. So before the deposit, the user is asked to approve the Dex contract to transfer his NFT.
+- Only those NFTs can be withdrawn from the Dex whose all shares belong to the same user. In other words, the user has to acquire the whole ownership (all shares) of an NFT before withdrawing it.
+Let's have a closer look at the NFT fractions repository contracts:
+The interface defines top-level functions that are called from other smart contracts, e.g: from bridge contracts:
 - Burn and mint are directly related to bridge contracts. When someone transfers his tokens from one chain to the other the bridge contract calls the burn function on the original chain and the mint function on the other chain. More on this one in a later detailed post about the bridge itself.
 - TransferFrom is the same as safeTransferFrom in ERC1155 with one restriction, the contract is not paused and it also introduces a hook function (_afterTransferFrom).
 - GetTotalFractionsAmount and getErc721ContractAddress are just reader functions
 The base contract (NftFractionsRepositoryBase) implements functions of the interface plus it introduces the hook functions that can be implemented by child contracts. These hook functions provide a possibility to hook in some logic (event emission or updating internal data structures) as detailed at the end of the previous post.
-Chain specific contracts mirrors the difference between using the Graph for data reading and directly reading from smart contracts. In case of Polygon contracts these hooks contain the event emission and in case of BSC contracts these hook functions update the internal data structures.
+Chain-specific contracts mirror the difference between using the Graph for data reading and directly reading from smart contracts. In the case of Polygon contracts, these hooks contain the event emission and in the case of BSC contracts, these hook functions update the internal data structures.
 Let's start with the Polygon contract (MaticFractionsRepositoryBase). It implements the depositNft and withrawNft functions since these are available on Polygon only. Plus it emits the corresponding depositNft and withdrawNft events that are indexed by the Graph.
-In contrast the BSC contract (BscNftFractionsRepository) handles three different internal data structures:
-- token IDs by share owners
+In contrast, the BSC contract (BscNftFractionsRepository) handles three different internal data structures:
+- token IDs by shareowners
 - owners by token ID
 - all token IDs
 All of them has a corresponding getter function:
@@ -26,5 +26,7 @@ They serve the data display use cases for the UI:
 - List of NFTs for a given user
 - List of owners of a given NFT
 - All NFTs
-In the next section we will detail the DEX contracts.
+In the next section, we will detail the DEX contracts.
 If you want to reach other articles in the series you can find links in the main article.
+Or if you would like to see my other projects and contributions:
+https://www.szabolcsszentes.com/
